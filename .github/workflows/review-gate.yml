@@ -1,0 +1,51 @@
+name: TMW-PR_Musikly - Review gate
+
+on:
+  pull_request:
+    branches: [indie-branch]
+    types: [opened, synchronize, reopened, ready_for_review, review_requested]
+  workflow_dispatch:
+
+jobs:
+  review-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Evaluate maintainer bypass or review requirement
+        uses: actions/github-script@v7
+        id: review_eval
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const prNumber = context.payload.pull_request?.number;
+            const author = context.payload.pull_request?.user?.login;
+            const repoContent = await github.rest.repos.getContent({ owner, repo, path: 'MAINTAINERS.md' }).catch(() => null);
+            const maintainerText = repoContent ? Buffer.from(repoContent.data.content, 'base64').toString() : '';
+            const isMaintainer = !!(author && maintainerText.includes(`@${author}`));
+
+            if (isMaintainer) {
+              core.setOutput('bypass', 'true');
+              core.setOutput('review_count', '1');
+              return;
+            }
+
+            const reviews = await github.paginate(github.rest.pulls.listReviews, { owner, repo, pull_number: prNumber, per_page: 100 });
+            const reviewCount = reviews.length;
+            core.setOutput('bypass', 'false');
+            core.setOutput('review_count', String(reviewCount));
+            if (reviewCount < 1) {
+              core.setFailed('At least one review is required unless the author is listed in MAINTAINERS.md.');
+            }
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enforce review policy locally
+        run: REVIEW_COUNT=${{ steps.review_eval.outputs.review_count }} PR_AUTHOR=${{ github.event.pull_request.user.login }} node scripts/check-review-policy.js

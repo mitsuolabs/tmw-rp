@@ -1,0 +1,21 @@
+{
+  "name": "tmw-rp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Premium browser radio project with governance, security, automation, and verification workflows.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:browser": "node tests/browser-smoke.test.js",
+    "check:signoff": "node scripts/check-signoff.js",
+    "check:review": "node scripts/check-review-policy.js",
+    "check:branch": "node scripts/check-branch-policy.js",
+    "hash:commit": "node scripts/commit-hash.js",
+    "bundle:release": "node scripts/archive-release.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.1"
+  }
+}

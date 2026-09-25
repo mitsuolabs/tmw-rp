@@ -1,0 +1,25 @@
+name: Documentation
+description: Improve docs, onboarding, or project guidance.
+title: ""
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is missing or unclear?
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Affected document
+      placeholder: README.md, GUIDE.md, CONTRIBUTING.md, or a code comment
+    validations:
+      required: true
+
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested update
+      description: Explain the clearer wording, examples, or structure you want.

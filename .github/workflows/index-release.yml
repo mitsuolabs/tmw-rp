@@ -1,0 +1,43 @@
+name: TMW-PR_Musikly - Index release
+
+on:
+  push:
+    branches: [indie-branch]
+    paths:
+      - 'index.html'
+      - 'README.md'
+      - 'GUIDE.md'
+      - 'CONTRIBUTING.md'
+      - 'MAINTAINERS.md'
+  workflow_dispatch:
+
+jobs:
+  package-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --no-fund --no-audit
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Build release tarball
+        run: npm run bundle:release
+
+      - name: Create release tag and publish asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="release-$(date -u +%Y%m%d%H%M%S)"
+          gh release create "$TAG" --generate-notes --title "TMW-RP release $(date -u +%Y-%m-%dT%H:%M:%SZ)" dist/tmw-rp-release.tar.gz

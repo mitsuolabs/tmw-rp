@@ -1,0 +1,7 @@
+# Repository ownership
+# Maintainers hold the access and review authority for this project.
+
+* @DanMit-Dev
+.github/ @DanMit-Dev
+scripts/ @DanMit-Dev
+README.md GUIDE.md CONTRIBUTING.md SECURITY.md NOTICE.md MAINTAINERS.md CodeOfConduct.md CodeOfDrivingCars.md corporate.md @DanMit-Dev

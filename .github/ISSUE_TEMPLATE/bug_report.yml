@@ -1,0 +1,62 @@
+name: Bug report
+description: Report a defect, broken flow, or runtime problem.
+title: ""
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please be specific about what broke and how to reproduce it.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is broken?
+      placeholder: The player fails to load a stream from a direct URL.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Open index.html
+        2. Paste a stream URL
+        3. Click Engage Link
+        4. Observe blank status and no audio
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: Chrome 127 / Firefox 128 / Safari 17
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: Linux / macOS / Windows
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes
+      description: Include logs, station URLs, and screenshots if useful.

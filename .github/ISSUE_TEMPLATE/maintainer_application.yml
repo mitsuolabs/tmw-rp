@@ -1,0 +1,78 @@
+name: Maintainer application
+description: Volunteer to become a maintainer or reviewer for TMW-RP.
+title: ""
+labels: ["maintainer", "governance"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for volunteering to help maintain the project. This intake is designed to prevent conflicting interests and to identify candidates who can reliably contribute to long-term stewardship.
+
+  - type: checkboxes
+    id: rival-affiliation
+    attributes:
+      label: Rival affiliation
+      description: Are you currently employed by or affiliated with a rival service or platform?
+      options:
+        - label: I am a worker, contractor, or affiliate of YouTube Music Premium, Amazon Music, iTunes, Spotify, Deezer, or a similar rival platform.
+          required: false
+    validations:
+      required: true
+
+  - type: textarea
+    id: competitive_disclosure
+    attributes:
+      label: Competitive disclosure
+      description: If you selected the rival affiliation checkbox above, explain the relationship and why the application is not a conflict.
+      placeholder: This application is automatically refused if the answer is yes. If not, leave blank.
+
+  - type: checkboxes
+    id: availability
+    attributes:
+      label: Weekly availability
+      options:
+        - label: 1 hour per week
+        - label: 2 hours per week
+        - label: 10 hours per week
+        - label: variable time (for example: some weeks 0 hours, other weeks 4+ hours)
+
+  - type: textarea
+    id: maintainer_experience
+    attributes:
+      label: Previous FOSS or maintenance experience
+      description: Which experiences did you have before on maintaining code in a FOSS or community environment?
+      placeholder: Describe your experience with open-source maintenance, review workflows, triage, releases, docs, or project governance.
+    validations:
+      required: true
+
+  - type: textarea
+    id: project_philosophy
+    attributes:
+      label: Alignment with project philosophy
+      description: How would you help keep the project premium, public, and resilient without adding lock-in or backend dependency?
+    validations:
+      required: true
+
+  - type: textarea
+    id: strongest_areas
+    attributes:
+      label: Strongest areas
+      description: Which areas are you strongest in: UI, testing, docs, review governance, security, release ops, or community moderation?
+    validations:
+      required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Review and stewardship approach
+      description: How would you review PRs, triage issues, and handle difficult disagreements responsibly?
+    validations:
+      required: true
+
+  - type: textarea
+    id: commitment
+    attributes:
+      label: Commitment statement
+      description: State your realistic maintenance commitment and boundaries.
+    validations:
+      required: true

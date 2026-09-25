@@ -1,0 +1,28 @@
+name: Feature request
+description: Propose a feature or product capability.
+title: ""
+labels: ["feature"]
+body:
+  - type: textarea
+    id: feature
+    attributes:
+      label: Feature request
+      description: What should the app do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why this matters
+      description: Explain the user problem and expected benefit.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What would make this done effectively?
+    validations:
+      required: true

@@ -1,0 +1,46 @@
+name: TMW-PR_Musikly - Release
+
+on:
+  push:
+    branches: [indie-branch]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run tests
+        run: npm install --no-fund --no-audit && npm test
+
+      - name: Compute commit hash
+        run: node scripts/commit-hash.js
+
+      - name: Bundle release payload
+        run: |
+          mkdir -p dist
+          cp index.html dist/
+          cp README.md dist/
+          cp GUIDE.md dist/
+          cp CONTRIBUTING.md dist/
+          cp LICENSE dist/
+          cd dist && zip -r ../tmw-rp-release.zip .
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            tmw-rp-release.zip
+            .artifacts/commit-hash.txt

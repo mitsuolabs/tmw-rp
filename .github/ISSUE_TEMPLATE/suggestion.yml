@@ -1,0 +1,28 @@
+name: Suggestion
+description: Share a product or UX improvement.
+title: ""
+labels: ["suggestion"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or friction
+      description: What is frustrating or weak in the current experience?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Proposed improvement
+      description: Describe the cleaner or more premium alternative.
+    validations:
+      required: true
+
+  - type: textarea
+    id: value
+    attributes:
+      label: User value
+      description: Why would this matter to listeners or maintainers?
+    validations:
+      required: true

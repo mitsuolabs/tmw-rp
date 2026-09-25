@@ -1,0 +1,26 @@
+name: Idea
+description: Share a large, strategic concept or future direction.
+title: ""
+labels: ["idea"]
+body:
+  - type: textarea
+    id: concept
+    attributes:
+      label: Concept
+      description: What is the big idea?
+    validations:
+      required: true
+
+  - type: textarea
+    id: vision
+    attributes:
+      label: Long-term vision
+      description: How does this support a stronger future for the project?
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and trade-offs
+      description: What should we preserve or avoid?

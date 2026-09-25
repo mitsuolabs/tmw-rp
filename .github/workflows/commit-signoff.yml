@@ -1,0 +1,26 @@
+name: TMW-PR_Musikly - Commit Sign-off Gate
+
+on:
+  pull_request:
+    branches: [indie-branch]
+    types: [opened, edited, synchronize, reopened]
+  push:
+    branches: [indie-branch]
+  workflow_dispatch:
+
+jobs:
+  signoff-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enforce Signed-off-by on all commits in history
+        run: node scripts/check-signoff.js

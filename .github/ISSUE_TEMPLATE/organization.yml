@@ -1,0 +1,26 @@
+name: Organization or governance
+description: Propose workflow, process, or repository organization improvements.
+title: ""
+labels: ["organization"]
+body:
+  - type: textarea
+    id: issue
+    attributes:
+      label: Proposal
+      description: What process or repo structure should change?
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: Why would this improve collaboration, quality, or maintainability?
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Expected impact
+      description: Which workflows, teams, or maintenance tasks would this affect?
