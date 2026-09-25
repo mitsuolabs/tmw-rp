@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — This music isn't real</title>
+  <style>
+    :root {
+      --bg: #08090d;
+      --panel: rgba(255,255,255,0.04);
+      --text: #f5f0d8;
+      --muted: #c8c6d2;
+      --accent: #fffe87;
+      --outline: rgba(255,255,255,0.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top, rgba(255,254,135,0.12), transparent 26%),
+        linear-gradient(180deg, #07090d 0%, #0c0d12 100%);
+    }
+
+    .panel {
+      width: min(760px, 100%);
+      border: 1px solid var(--outline);
+      background: var(--panel);
+      border-radius: 18px;
+      padding: clamp(26px, 4vw, 52px);
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.32);
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 16px;
+      padding: 7px 12px;
+      border: 1px solid rgba(255, 254, 135, 0.4);
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(255,254,135,0.06);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: clamp(2.6rem, 7vw, 6rem);
+      line-height: 0.9;
+      letter-spacing: -0.06em;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    p {
+      margin: 0 auto 22px;
+      max-width: 640px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      line-height: 1.7;
+    }
+
+    .cta {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      background: var(--text);
+      color: var(--bg);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .cta:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .report {
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .report a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <div class="eyebrow">404 Signal Lost</div>
+    <h1>Sorry, But This Music isn't real.</h1>
+    <p>
+      The stream you were looking for is not here, not in the archive, and not in the signal path.
+      It may be a broken route, a stale link, or a real bug in the radio stack.
+    </p>
+    <a class="cta" href="/">Return to the studio</a>
+    <div class="report">
+      Report as bug: <a href="https://github.com/mitsuolabs/tmw-rp/issues" target="_blank" rel="noreferrer">github.com/mitsuolabs/tmw-rp/issues</a>
+    </div>
+  </main>
+</body>
+</html>
