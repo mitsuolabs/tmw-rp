@@ -23,10 +23,23 @@ jobs:
           node-version: 20
 
       - name: Run tests
-        run: npm install --no-fund --no-audit && npm test
+        run: |
+          npm install --no-fund --no-audit
+          npx playwright install --with-deps chromium
+          npm test
 
       - name: Compute commit hash
         run: node scripts/commit-hash.js
+
+      - name: Create release tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME:-v0.1.0}"
+          git config user.name "DanMit-Dev"
+          git config user.email "contact@mitsuolabs.com"
+          git tag -a "$TAG" -m "Release $TAG" || true
+          git push origin "$TAG" || true
 
       - name: Bundle release payload
         run: |
@@ -41,6 +54,7 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name || 'v0.1.0' }}
           files: |
             tmw-rp-release.zip
             .artifacts/commit-hash.txt

@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm install --no-fund --no-audit
 
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
       - name: Run test suite
         run: npm test
 
@@ -40,4 +43,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="release-$(date -u +%Y%m%d%H%M%S)"
+          git config user.name "DanMit-Dev"
+          git config user.email "contact@mitsuolabs.com"
+          git tag -a "$TAG" -m "Release $TAG" || true
+          git push origin "$TAG" || true
           gh release create "$TAG" --generate-notes --title "TMW-RP release $(date -u +%Y-%m-%dT%H:%M:%SZ)" dist/tmw-rp-release.tar.gz
