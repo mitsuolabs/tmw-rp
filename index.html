@@ -1,2692 +1,2666 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TMW-RP</title>
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'none';
-        script-src 'self' 'unsafe-inline';
-        style-src 'self' 'unsafe-inline';
-        img-src 'self' data:;
-        media-src 'self' https: data: blob:;
-        connect-src 'self' https: wss: ws: data: blob:;
-        object-src 'none';
-        base-uri 'none';
-        form-action 'none';
-    " />
-    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
-    <meta http-equiv="Permissions-Policy" content="
-        accelerometer=(),
-        ambient-light-sensor=(),
-        battery=(),
-        camera=(),
-        display-capture=(),
-        document-domain=(),
-        encrypted-media=(),
-        fullscreen=(self),
-        gyroscope=(),
-        geolocation=(),
-        microphone=(),
-        midi=(),
-        payment=(),
-        picture-in-picture=(),
-        screen-wake-lock=()
-    " />
-    <meta name="referrer" content="no-referrer" />
-    <meta name="X-Content-Type-Options" content="nosniff" />
-    <meta name="X-Frame-Options" content="DENY" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22none%22/></svg>" />
-    <style>
-        :root {
-            --bg-0: #05070b;
-            --bg-1: #0d1117;
-            --bg-2: #121922;
-            --panel: rgba(255,255,255,0.035);
-            --panel-strong: rgba(255,255,255,0.07);
-            --panel-soft: rgba(255,255,255,0.025);
-            --line: rgba(255,255,255,0.12);
-            --line-strong: rgba(255,255,255,0.2);
-            --text: #f7f3de;
-            --text-strong: #ffffff;
-            --muted: #b9bcc8;
-            --muted-2: #8e93a7;
-            --accent: #ffef86;
-            --accent-2: #ffe66d;
-            --accent-3: #fff9c4;
-            --success: #7cf2b1;
-            --warning: #ffd166;
-            --danger: #ff6b6b;
-            --shadow: rgba(0,0,0,0.45);
-            --radius: 12px;
-            --transition: 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
-            height: 100%;
-            background: var(--bg-0);
-            color: var(--text);
-            font-family: var(--font);
-            overflow: hidden;
-        }
-
-        * {
-            box-sizing: border-box;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 239, 134, 0.35) transparent;
-        }
-
-        *::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        *::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        *::-webkit-scrollbar-thumb {
-            background: rgba(255, 239, 134, 0.28);
-            border-radius: 999px;
-        }
-
-        ::selection {
-            background: rgba(255, 239, 134, 0.2);
-            color: var(--text-strong);
-        }
-
-        a {
-            color: inherit;
-        }
-
-        button, select, input, textarea {
-            font: inherit;
-        }
-
-        body {
-            display: grid;
-            grid-template-columns: 430px minmax(0, 1fr);
-        }
-
-        .console {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding: 28px 26px 22px;
-            border-right: 1px solid var(--line);
-            background:
-                linear-gradient(180deg, rgba(5,7,11,0.96), rgba(18,25,34,0.74)),
-                radial-gradient(circle at top left, rgba(255,239,134,0.08), transparent 30%);
-        }
-
-        .console::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 18%, transparent 82%, rgba(255,255,255,0.02));
-        }
-
-        .brand-header {
-            position: relative;
-            z-index: 1;
-            margin-bottom: 22px;
-            padding-bottom: 18px;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .brand-header h1 {
-            margin: 0;
-            font-size: 1.3rem;
-            font-weight: 500;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--accent);
-        }
-
-        .brand-header p {
-            margin-top: 7px;
-            font-size: 0.7rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .control-group {
-            position: relative;
-            z-index: 1;
-            margin-bottom: 20px;
-        }
-
-        .control-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 0.64rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        select, input[type="text"], input[type="search"], textarea {
-            width: 100%;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.14);
-            border-radius: 8px;
-            color: var(--text);
-            padding: 12px 14px;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
-        }
-
-        select:focus, input[type="text"]:focus, input[type="search"]:focus, textarea:focus {
-            border-color: rgba(255,239,134,0.7);
-            box-shadow: 0 0 0 1px rgba(255,239,134,0.12);
-            background: rgba(255,255,255,0.03);
-        }
-
-        select option {
-            background: #0d1117;
-            color: var(--text);
-        }
-
-        input::placeholder, textarea::placeholder {
-            color: rgba(185,188,200,0.7);
-        }
-
-        button {
-            appearance: none;
-            border: 1px solid rgba(255,255,255,0.14);
-            background: rgba(255,255,255,0.02);
-            color: var(--text);
-            border-radius: 8px;
-            padding: 12px 14px;
-            cursor: pointer;
-            font-size: 0.72rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            transition: border-color var(--transition), background var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
-        }
-
-        button:hover {
-            border-color: rgba(255,239,134,0.6);
-            background: rgba(255,239,134,0.05);
-            color: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:focus-visible,
-        select:focus-visible,
-        input:focus-visible,
-        textarea:focus-visible {
-            outline: 2px solid rgba(255,239,134,0.9);
-            outline-offset: 2px;
-        }
-
-        .btn-primary {
-            background: var(--text);
-            color: #090d12;
-            border-color: var(--text);
-            font-weight: 700;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #090d12;
-            box-shadow: 0 0 22px rgba(255,239,134,0.2);
-        }
-
-        .btn-danger {
-            background: rgba(255,107,107,0.08);
-            border-color: rgba(255,107,107,0.36);
-            color: #ffc1c1;
-        }
-
-        .row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .row > button {
-            flex: 1;
-        }
-
-        .eq-matrix {
-            position: relative;
-            z-index: 1;
-            display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            align-items: end;
-            gap: 8px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 12px 10px 12px;
-            min-height: 154px;
-        }
-
-        .eq-band {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-            height: 100%;
-        }
-
-        .eq-band input[type="range"] {
-            -webkit-appearance: slider-vertical;
-            appearance: slider-vertical;
-            writing-mode: bt-lr;
-            width: 8px;
-            height: 78px;
-            margin: 0;
-            padding: 0;
-            background: transparent;
-        }
-
-        .eq-band input[type="range"]::-webkit-slider-runnable-track {
-            background: linear-gradient(180deg, rgba(255,239,134,0.3), rgba(255,255,255,0.08));
-            border-radius: 999px;
-        }
-
-        .eq-band input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
-            border: 0;
-            box-shadow: 0 0 0 2px rgba(255,239,134,0.15);
-            margin-left: -2px;
-        }
-
-        .eq-band input[type="range"]::-moz-range-track {
-            background: linear-gradient(180deg, rgba(255,239,134,0.3), rgba(255,255,255,0.08));
-            border-radius: 999px;
-        }
-
-        .eq-band input[type="range"]::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border: 0;
-            border-radius: 50%;
-        }
-
-        .eq-band span {
-            font-size: 0.58rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .preset-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .preset-chip {
-            flex: 1 1 calc(33.333% - 8px);
-            min-width: 76px;
-            padding: 9px 10px;
-            font-size: 0.6rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            border-radius: 8px;
-        }
-
-        .preset-chip.active {
-            background: rgba(255,239,134,0.1);
-            border-color: rgba(255,239,134,0.6);
-            color: var(--accent);
-        }
-
-        .panel-block {
-            position: relative;
-            z-index: 1;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-top: 18px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-
-        .panel-block h3 {
-            margin: 0 0 10px;
-            font-size: 0.66rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .meta-card {
-            background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.015));
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 11px 12px;
-            min-height: 84px;
-            transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
-        }
-
-        .meta-card:hover {
-            border-color: rgba(255,239,134,0.28);
-            transform: translateY(-1px);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 20px rgba(0,0,0,0.16);
-        }
-
-        .meta-label {
-            display: block;
-            margin-bottom: 7px;
-            color: var(--muted);
-            font-size: 0.56rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
-
-        .meta-card strong {
-            display: block;
-            font-size: 0.86rem;
-            line-height: 1.45;
-            color: var(--text);
-            font-weight: 500;
-            word-break: break-word;
-        }
-
-        .metadata-sheet {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .metadata-item {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 9px;
-            padding: 10px 10px 9px;
-        }
-
-        .metadata-item .k {
-            display: block;
-            margin-bottom: 7px;
-            color: var(--muted);
-            font-size: 0.54rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
-
-        .metadata-item .v {
-            color: var(--text);
-            font-size: 0.8rem;
-            line-height: 1.45;
-            word-break: break-word;
-        }
-
-        .stack-list,
-        .history-list,
-        .favorites-list,
-        .queue-list,
-        .notices-list,
-        .manual-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin: 0;
-            padding: 0;
-        }
-
-        .stack-list li,
-        .history-list li,
-        .favorites-list li,
-        .queue-list li,
-        .notices-list li,
-        .manual-list li {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            padding: 9px 10px;
-            font-size: 0.74rem;
-            line-height: 1.5;
-            color: var(--text);
-            cursor: pointer;
-            transition: border-color var(--transition), background var(--transition), transform var(--transition);
-        }
-
-        .stack-list li:hover,
-        .history-list li:hover,
-        .favorites-list li:hover,
-        .queue-list li:hover,
-        .notices-list li:hover,
-        .manual-list li:hover {
-            background: rgba(255,239,134,0.04);
-            border-color: rgba(255,239,134,0.28);
-            transform: translateY(-1px);
-        }
-
-        .notices-list a,
-        .manual-list a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        .bottom-panels {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .hud-pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 28px;
-            border-radius: 999px;
-            border: 1px solid rgba(255,239,134,0.4);
-            background: rgba(255,239,134,0.08);
-            color: var(--accent);
-            font-size: 0.58rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            padding: 5px 10px;
-            margin-top: 8px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .stage {
-            position: relative;
-            overflow-y: auto;
-            min-width: 0;
-            min-height: 100vh;
-            padding: clamp(18px, 2vw, 38px);
-            background:
-                radial-gradient(circle at 85% 10%, rgba(255,239,134,0.08), transparent 24%),
-                linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0));
-        }
-
-        .stage::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 14%, transparent 82%, rgba(255,255,255,0.02));
-            pointer-events: none;
-        }
-
-        .stage-inner {
-            position: relative;
-            z-index: 1;
-        }
-
-        .now-playing {
-            margin-bottom: 18px;
-        }
-
-        .live-pill-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .live-pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 999px;
-            border: 1px solid rgba(255,239,134,0.38);
-            background: rgba(255,239,134,0.08);
-            color: var(--accent);
-            font-size: 0.6rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            padding: 6px 10px;
-        }
-
-        .stream-title {
-            display: block;
-            font-size: 0.82rem;
-            color: var(--text);
-            letter-spacing: 0.06em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: min(740px, 80vw);
-        }
-
-        .now-playing h2 {
-            margin: 0;
-            font-size: clamp(2rem, 2vw + 1.2rem, 3rem);
-            line-height: 1.1;
-            letter-spacing: 0.02em;
-            font-weight: 400;
-            color: var(--accent);
-            word-break: break-word;
-        }
-
-        .now-playing .subtitle {
-            margin-top: 8px;
-            color: var(--muted);
-            font-size: 0.96rem;
-            font-family: var(--mono);
-        }
-
-        .visualizer-wrap {
-            position: relative;
-            display: grid;
-            place-items: center;
-            min-height: 420px;
-            margin-top: 26px;
-            border-radius: 18px;
-            overflow: hidden;
-            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-        }
-
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            max-height: 500px;
-            filter: drop-shadow(0 0 18px rgba(255,239,134,0.08));
-        }
-
-        .feature-strip {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
-            margin-top: 18px;
-            padding: 10px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .feature-chip {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 58px;
-            text-align: center;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.015);
-            color: var(--muted);
-            font-size: 0.6rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: border-color var(--transition), color var(--transition), background var(--transition), transform var(--transition);
-        }
-
-        .feature-chip:hover,
-        .feature-chip.active {
-            border-color: rgba(255,239,134,0.6);
-            background: rgba(255,239,134,0.06);
-            color: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        .advanced-rail {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-            margin-top: 20px;
-        }
-
-        .insight-panel {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 14px;
-            min-height: 150px;
-        }
-
-        .insight-panel h4 {
-            margin: 0 0 12px;
-            color: var(--muted);
-            font-size: 0.64rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-        }
-
-        .insight-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-        }
-
-        .insight-stat {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 9px;
-            padding: 10px 10px 9px;
-        }
-
-        .insight-stat strong {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 1.04rem;
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .insight-stat span {
-            color: var(--muted);
-            font-size: 0.56rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
-
-        .professional-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .toolbar-btn {
-            flex: 1 1 120px;
-            min-width: 120px;
-            width: auto;
-        }
-
-        .brand-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 20px;
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.02);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-        }
-
-        .brand-bar span {
-            color: var(--muted);
-            font-size: 0.62rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-        }
-
-        .brand-bar strong {
-            color: var(--accent);
-            font-size: 0.82rem;
-            font-weight: 600;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(0,0,0,0.7);
-        }
-
-        .modal-overlay.hidden {
-            display: none;
-        }
-
-        .modal-panel {
-            width: min(820px, 92vw);
-            max-height: 82vh;
-            overflow: auto;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.14);
-            background: rgba(10,13,18,0.96);
-            box-shadow: 0 24px 90px rgba(0,0,0,0.5);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 18px 20px 14px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 0.94rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--accent);
-        }
-
-        .modal-close {
-            width: auto;
-            min-width: 110px;
-            padding: 10px 14px;
-        }
-
-        .modal-body {
-            padding: 18px 20px 20px;
-            color: var(--text);
-            line-height: 1.7;
-            font-size: 0.92rem;
-        }
-
-        .modal-body ul {
-            list-style: none;
-            padding: 0;
-            margin: 12px 0 0;
-            display: grid;
-            gap: 10px;
-        }
-
-        .modal-body li {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .modal-body a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        .toast {
-            position: fixed;
-            right: 24px;
-            bottom: 24px;
-            z-index: 120;
-            max-width: min(360px, calc(100vw - 32px));
-            background: rgba(10,13,18,0.96);
-            border: 1px solid rgba(255,239,134,0.32);
-            border-radius: 10px;
-            color: var(--text);
-            padding: 12px 16px;
-            box-shadow: 0 18px 42px rgba(0,0,0,0.32);
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            opacity: 0;
-            transform: translateY(12px);
-            transition: opacity var(--transition), transform var(--transition);
-            pointer-events: none;
-        }
-
-        .toast.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .hud-overlay {
-            position: fixed;
-            right: 22px;
-            bottom: 22px;
-            z-index: 80;
-            width: min(360px, calc(100vw - 30px));
-            padding: 14px 16px 12px;
-            border-radius: 16px;
-            background: rgba(9, 12, 17, 0.82);
-            border: 1px solid rgba(255,239,134,0.28);
-            box-shadow: 0 18px 42px rgba(0,0,0,0.34);
-            backdrop-filter: blur(10px);
-            display: grid;
-            gap: 10px;
-            pointer-events: none;
-        }
-
-        .hud-overlay.hidden {
-            display: none;
-        }
-
-        .hud-overlay-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .hud-live {
-            color: var(--accent);
-            font-size: 0.58rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-        }
-
-        .hud-title {
-            color: var(--text);
-            font-weight: 600;
-            font-size: 0.96rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .hud-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .hud-stat {
-            padding: 8px 10px;
-            border-radius: 9px;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .hud-stat strong {
-            display: block;
-            margin-bottom: 3px;
-            color: var(--text);
-            font-size: 0.82rem;
-        }
-
-        .hud-stat span {
-            color: var(--muted);
-            font-size: 0.52rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
-
-        .hud-canvas-wrap {
-            height: 76px;
-            overflow: hidden;
-            border-radius: 9px;
-            border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .hud-canvas-wrap canvas {
-            display: block;
-            width: 100%;
-            height: 76px;
-        }
-
-        .volume-row {
-            display: grid;
-            grid-template-columns: 72px 1fr 52px;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .volume-label {
-            font-size: 0.58rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .volume-value {
-            font-size: 0.6rem;
-            color: var(--muted);
-            text-align: right;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        .slider-horizontal {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 2px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.2);
-            outline: none;
-            margin: 0;
-        }
-
-        .slider-horizontal::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent);
-            cursor: pointer;
-            border: 0;
-        }
-
-        .slider-horizontal::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent);
-            border: 0;
-            cursor: pointer;
-        }
-
-        body.hud-active .console {
-            opacity: 0.24;
-            filter: grayscale(0.2);
-        }
-
-        body.hud-active .stage {
-            transform: scale(0.985);
-            transform-origin: center center;
-        }
-
-        @media (max-width: 1000px) {
-            body {
-                display: block;
-                overflow-y: auto;
-            }
-
-            .console {
-                min-height: auto;
-                border-right: none;
-                border-bottom: 1px solid var(--line);
-            }
-
-            .stage {
-                min-height: auto;
-                max-height: none;
-                overflow: visible;
-            }
-
-            .advanced-rail {
-                grid-template-columns: 1fr;
-            }
-
-            .feature-strip {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 720px) {
-            .eq-matrix {
-                grid-template-columns: repeat(5, minmax(0, 1fr));
-            }
-
-            .metadata-sheet,
-            .meta-grid,
-            .bottom-panels {
-                grid-template-columns: 1fr;
-            }
-
-            .feature-strip {
-                grid-template-columns: 1fr;
-            }
-
-            .row {
-                flex-direction: column;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TMW-RP | Enhanced Radio Engine</title>
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'none';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    media-src 'self' https: data: blob:;
+    connect-src 'self' https: wss: ws: data: blob:;
+    object-src 'none';
+    base-uri 'none';
+    form-action 'none';
+  " />
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
+  <meta http-equiv="Permissions-Policy" content="
+    accelerometer=(),
+    ambient-light-sensor=(),
+    battery=(),
+    camera=(),
+    display-capture=(),
+    document-domain=(),
+    encrypted-media=(),
+    fullscreen=(self),
+    gyroscope=(),
+    geolocation=(),
+    microphone=(),
+    midi=(),
+    payment=(),
+    picture-in-picture=(),
+    screen-wake-lock=()
+  " />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="X-Content-Type-Options" content="nosniff" />
+  <meta name="X-Frame-Options" content="DENY" />
+  <style>
+    :root {
+      --bg-0: #05070b;
+      --bg-1: #0d1117;
+      --bg-2: #121922;
+      --panel: rgba(255,255,255,0.035);
+      --panel-strong: rgba(255,255,255,0.07);
+      --panel-soft: rgba(255,255,255,0.025);
+      --line: rgba(255,255,255,0.12);
+      --line-strong: rgba(255,255,255,0.2);
+      --text: #f7f3de;
+      --text-strong: #ffffff;
+      --muted: #b9bcc8;
+      --muted-2: #8e93a7;
+      --accent: #ffef86;
+      --accent-2: #ffe66d;
+      --accent-3: #fff9c4;
+      --success: #7cf2b1;
+      --warning: #ffd166;
+      --danger: #ff6b6b;
+      --info: #86d9ff;
+      --shadow: rgba(0,0,0,0.45);
+      --radius: 12px;
+      --transition: 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      min-height: 100%;
+      background: var(--bg-0);
+      color: var(--text);
+      font-family: var(--font);
+      overflow: hidden;
+    }
+
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,239,134,0.35) transparent;
+    }
+
+    *::-webkit-scrollbar { width: 10px; height: 10px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    *::-webkit-scrollbar-thumb {
+      background: rgba(255,239,134,0.28);
+      border-radius: 999px;
+    }
+
+    ::selection {
+      background: rgba(255,239,134,0.2);
+      color: var(--text-strong);
+    }
+
+    a { color: inherit; }
+    button, select, input, textarea { font: inherit; }
+
+    body {
+      display: grid;
+      grid-template-columns: 450px minmax(0, 1fr);
+    }
+
+    .console {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 26px 24px 20px;
+      border-right: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(5,7,11,0.96), rgba(18,25,34,0.74)),
+        radial-gradient(circle at top left, rgba(255,239,134,0.08), transparent 30%);
+      overflow-y: auto;
+    }
+
+    .console::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 18%, transparent 82%, rgba(255,255,255,0.02));
+    }
+
+    .brand-header {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-header h1 {
+      margin: 0;
+      font-size: 1.22rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .brand-header p {
+      margin-top: 6px;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .brand-tagline {
+      margin-top: 5px;
+      font-size: 0.58rem;
+      color: rgba(255,239,134,0.5);
+      font-style: italic;
+      letter-spacing: 0.05em;
+    }
+
+    .control-group {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 14px;
+    }
+
+    .control-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    select, input[type="text"], input[type="search"], input[type="time"], input[type="number"], input[type="file"], textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+
+    select:focus, input:focus, textarea:focus {
+      border-color: rgba(255,239,134,0.7);
+      box-shadow: 0 0 0 1px rgba(255,239,134,0.12);
+      background: rgba(255,255,255,0.03);
+    }
+
+    select option { background: #0d1117; color: var(--text); }
+    input::placeholder, textarea::placeholder { color: rgba(185,188,200,0.7); }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.02);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: border-color var(--transition), background var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+
+    button:hover {
+      border-color: rgba(255,239,134,0.6);
+      background: rgba(255,239,134,0.05);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    button:active { transform: translateY(0); }
+
+    button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid rgba(255,239,134,0.9);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: #090d12;
+      border-color: var(--text);
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #090d12;
+      box-shadow: 0 0 22px rgba(255,239,134,0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .btn-danger {
+      background: rgba(255,107,107,0.08);
+      border-color: rgba(255,107,107,0.36);
+      color: #ffc1c1;
+    }
+
+    .btn-success {
+      background: rgba(124,242,177,0.08);
+      border-color: rgba(124,242,177,0.36);
+      color: #b8f5d8;
+    }
+
+    .btn-sm {
+      padding: 7px 10px;
+      font-size: 0.6rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .row > button, .row > input {
+      flex: 1;
+    }
+
+    .eq-matrix {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: end;
+      gap: 6px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 8px 12px;
+      min-height: 150px;
+    }
+
+    .eq-band {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      height: 100%;
+    }
+
+    .eq-band input[type="range"] {
+      -webkit-appearance: slider-vertical;
+      appearance: slider-vertical;
+      writing-mode: bt-lr;
+      width: 7px;
+      height: 72px;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    .eq-band input[type="range"]::-webkit-slider-runnable-track {
+      background: linear-gradient(180deg, rgba(255,239,134,0.3), rgba(255,255,255,0.08));
+      border-radius: 999px;
+    }
+
+    .eq-band input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      border: 0;
+      box-shadow: 0 0 0 2px rgba(255,239,134,0.15);
+      margin-left: -2px;
+    }
+
+    .eq-band input[type="range"]::-moz-range-track {
+      background: linear-gradient(180deg, rgba(255,239,134,0.3), rgba(255,255,255,0.08));
+      border-radius: 999px;
+    }
+
+    .eq-band input[type="range"]::-moz-range-thumb {
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border: 0;
+      border-radius: 50%;
+    }
+
+    .eq-band span {
+      font-size: 0.54rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .preset-chip {
+      flex: 1 1 calc(33.333% - 6px);
+      min-width: 68px;
+      padding: 7px 8px;
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 7px;
+    }
+
+    .preset-chip.active {
+      background: rgba(255,239,134,0.1);
+      border-color: rgba(255,239,134,0.6);
+      color: var(--accent);
+    }
+
+    .panel-block {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 11px 12px;
+      margin-top: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .panel-block h3 {
+      margin: 0 0 8px;
+      font-size: 0.64rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .meta-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.015));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 9px;
+      padding: 10px 11px;
+      min-height: 78px;
+      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+
+    .meta-card:hover {
+      border-color: rgba(255,239,134,0.28);
+      transform: translateY(-1px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 20px rgba(0,0,0,0.16);
+    }
+
+    .meta-label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.54rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .meta-card strong {
+      display: block;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      color: var(--text);
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .metadata-sheet {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .metadata-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 9px 9px 8px;
+    }
+
+    .metadata-item .k {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.52rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .metadata-item .v {
+      color: var(--text);
+      font-size: 0.78rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .list-wrapper {
+      max-height: 160px;
+      overflow-y: auto;
+      border-radius: 8px;
+    }
+
+    .favorites-list, .queue-list, .history-list, .scheduler-list, .manual-list, .notices-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .favorites-list li, .queue-list li, .history-list li, .scheduler-list li, .manual-list li, .notices-list li {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 7px;
+      padding: 8px 9px;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+    }
+
+    .favorites-list li:hover, .queue-list li:hover, .history-list li:hover, .scheduler-list li:hover, .manual-list li:hover, .notices-list li:hover {
+      background: rgba(255,239,134,0.04);
+      border-color: rgba(255,239,134,0.28);
+      transform: translateY(-1px);
+    }
+
+    .list-item-remove {
+      float: right;
+      background: rgba(255,107,107,0.1);
+      border: 1px solid rgba(255,107,107,0.3);
+      color: #ffc1c1;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 0.6rem;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .list-item-remove:hover {
+      background: rgba(255,107,107,0.25);
+      border-color: rgba(255,107,107,0.6);
+    }
+
+    .bottom-panels {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .hud-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,239,134,0.4);
+      background: rgba(255,239,134,0.08);
+      color: var(--accent);
+      font-size: 0.56rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      margin-top: 6px;
+    }
+
+    .pill-success { border-color: rgba(124,242,177,0.5); background: rgba(124,242,177,0.1); color: #a8f0d0; }
+    .pill-warning { border-color: rgba(255,209,102,0.5); background: rgba(255,209,102,0.1); color: #ffe0a8; }
+    .pill-danger { border-color: rgba(255,107,107,0.5); background: rgba(255,107,107,0.1); color: #ffc1c1; }
+
+    .hidden { display: none !important; }
+
+    .stage {
+      position: relative;
+      overflow-y: auto;
+      min-width: 0;
+      min-height: 100vh;
+      padding: clamp(18px, 2vw, 38px);
+      background:
+        radial-gradient(circle at 85% 10%, rgba(255,239,134,0.08), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0));
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 14%, transparent 82%, rgba(255,255,255,0.02));
+      pointer-events: none;
+    }
+
+    .stage-inner { position: relative; z-index: 1; }
+
+    .now-playing { margin-bottom: 18px; }
+
+    .live-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid rgba(255,239,134,0.38);
+      background: rgba(255,239,134,0.08);
+      color: var(--accent);
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 5px 9px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 0.56rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+    }
+
+    .stream-title {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: min(740px, 80vw);
+    }
+
+    .now-playing h2 {
+      margin: 0;
+      font-size: clamp(2rem, 2vw + 1.2rem, 3rem);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      font-weight: 400;
+      color: var(--accent);
+      word-break: break-word;
+    }
+
+    .now-playing .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-family: var(--mono);
+    }
+
+    .time-display {
+      margin-top: 8px;
+      font-size: 0.88rem;
+      color: var(--info);
+      font-family: var(--mono);
+    }
+
+    .visualizer-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 420px;
+      margin-top: 24px;
+      border-radius: 18px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-height: 500px;
+      filter: drop-shadow(0 0 18px rgba(255,239,134,0.08));
+    }
+
+    .feature-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .feature-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 54px;
+      text-align: center;
+      border-radius: 9px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.015);
+      color: var(--muted);
+      font-size: 0.58rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 8px 6px;
+      transition: border-color var(--transition), color var(--transition), background var(--transition), transform var(--transition);
+    }
+
+    .feature-chip:hover, .feature-chip.active {
+      border-color: rgba(255,239,134,0.6);
+      background: rgba(255,239,134,0.06);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .advanced-rail {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .insight-panel {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 140px;
+    }
+
+    .insight-panel h4 {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .insight-stat {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 9px 9px 8px;
+    }
+
+    .insight-stat strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 1rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .insight-stat span {
+      color: var(--muted);
+      font-size: 0.54rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .professional-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .toolbar-btn {
+      flex: 1 1 110px;
+      min-width: 110px;
+      width: auto;
+    }
+
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .brand-bar span {
+      color: var(--muted);
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand-bar strong {
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0,0,0,0.7);
+    }
+
+    .modal-overlay.hidden { display: none; }
+
+    .modal-panel {
+      width: min(820px, 92vw);
+      max-height: 82vh;
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(10,13,18,0.96);
+      box-shadow: 0 24px 90px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 0.92rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .modal-close {
+      width: auto;
+      min-width: 100px;
+      padding: 9px 12px;
+    }
+
+    .modal-body {
+      padding: 16px 18px 18px;
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 0.9rem;
+    }
+
+    .modal-body ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .modal-body li {
+      padding: 9px 11px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .modal-body a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 120;
+      max-width: min(360px, calc(100vw - 32px));
+      background: rgba(10,13,18,0.96);
+      border: 1px solid rgba(255,239,134,0.32);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 11px 15px;
+      box-shadow: 0 18px 42px rgba(0,0,0,0.32);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity var(--transition), transform var(--transition);
+      pointer-events: none;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hud-overlay {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 80;
+      width: min(360px, calc(100vw - 30px));
+      padding: 13px 15px 11px;
+      border-radius: 16px;
+      background: rgba(9, 12, 17, 0.82);
+      border: 1px solid rgba(255,239,134,0.28);
+      box-shadow: 0 18px 42px rgba(0,0,0,0.34);
+      backdrop-filter: blur(10px);
+      display: grid;
+      gap: 9px;
+      pointer-events: none;
+    }
+
+    .hud-overlay.hidden { display: none; }
+
+    .hud-overlay-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 9px;
+    }
+
+    .hud-live {
+      color: var(--accent);
+      font-size: 0.56rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hud-title {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.92rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hud-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .hud-stat {
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .hud-stat strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+
+    .hud-stat span {
+      color: var(--muted);
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .hud-canvas-wrap {
+      height: 72px;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .hud-canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 72px;
+    }
+
+    .volume-row {
+      display: grid;
+      grid-template-columns: 65px 1fr 48px;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .volume-label {
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .volume-value {
+      font-size: 0.58rem;
+      color: var(--muted);
+      text-align: right;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .slider-horizontal {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+      outline: none;
+      margin: 0;
+    }
+
+    .slider-horizontal::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 0;
+    }
+
+    .slider-horizontal::-moz-range-thumb {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 0;
+      cursor: pointer;
+    }
+
+    .scheduler-ui {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .scheduler-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr 1fr;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .scheduler-row input[type="time"], .scheduler-row input[type="text"], .scheduler-row select {
+      font-size: 0.8rem;
+    }
+
+    .timer-display {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: var(--info);
+      background: rgba(134,217,255,0.08);
+      border: 1px solid rgba(134,217,255,0.2);
+      border-radius: 6px;
+      padding: 6px 8px;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .active-schedule {
+      animation: pulse-soft 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-soft {
+      0%, 100% { border-color: rgba(134,217,255,0.2); }
+      50% { border-color: rgba(134,217,255,0.5); }
+    }
+
+    body.hud-active .console {
+      opacity: 0.22;
+      filter: grayscale(0.25);
+    }
+
+    body.hud-active .stage {
+      transform: scale(0.984);
+      transform-origin: center center;
+    }
+
+    @media (max-width: 1100px) {
+      body { display: block; overflow-y: auto; }
+      .console {
+        min-height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+      .stage {
+        min-height: auto;
+        max-height: none;
+        overflow: visible;
+      }
+      .advanced-rail { grid-template-columns: 1fr; }
+      .feature-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .bottom-panels { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .eq-matrix { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .metadata-sheet, .meta-grid, .bottom-panels, .scheduler-row { grid-template-columns: 1fr; }
+      .feature-strip { grid-template-columns: 1fr; }
+      .row { flex-direction: column; }
+      .scheduler-row { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <aside class="console">
-        <div class="brand-header">
-            <h1>The MitsuoLabs</h1>
-            <p>Web Radio Player</p>
-        </div>
-
-        <div class="control-group">
-            <label>Signal Discovery Node</label>
-            <select id="registry-base">
-                <option value="radiobrowser">Radio Browser API (Decentralized)</option>
-                <option value="custom-url">Direct Stream URL</option>
-                <option value="csv">Offline Hardware CSV Loader</option>
-                <option value="playlist">M3U Playlist Loader</option>
-            </select>
-        </div>
-
-        <div class="control-group">
-            <label>Vector Search Parameter</label>
-            <input type="text" id="search-query" placeholder="Search by genre, city, or station name">
-            <input type="text" id="custom-url-input" class="hidden" placeholder="Paste a direct stream URL (MP3, AAC, OGG, or .m3u8)">
-            <button id="btn-query" style="margin-top: 14px;">Execute Scan</button>
-            <input type="file" id="csv-file-input" class="hidden" accept=".csv,.txt,.m3u,.m3u8,.pls" />
-        </div>
-
-        <div class="control-group">
-            <label>Secure Audio Target</label>
-            <select id="target-station">
-                <option value="">Select a station</option>
-            </select>
-        </div>
-
-        <div class="row">
-            <button id="btn-play" class="btn-primary">Engage Link</button>
-            <button id="btn-stop" class="btn-danger">Sever Link</button>
-        </div>
-
-        <div class="row">
-            <button id="btn-favorite">Add Favorite</button>
-            <button id="btn-queue">Queue Station</button>
-        </div>
-
-        <div class="control-group" style="margin-top: 18px;">
-            <label>Master DSP Equalizer Matrix</label>
-            <div class="eq-matrix" id="eq-matrix">
-                <div class="eq-band">
-                    <input type="range" class="eq-slider" data-index="0" min="-12" max="12" step="0.1" value="0" orient="vertical" />
-                    <span>60Hz</span>
-                </div>
-                <div class="eq-band">
-                    <input type="range" class="eq-slider" data-index="1" min="-12" max="12" step="0.1" value="0" orient="vertical" />
-                    <span>230Hz</span>
-                </div>
-                <div class="eq-band">
-                    <input type="range" class="eq-slider" data-index="2" min="-12" max="12" step="0.1" value="0" orient="vertical" />
-                    <span>910Hz</span>
-                </div>
-                <div class="eq-band">
-                    <input type="range" class="eq-slider" data-index="3" min="-12" max="12" step="0.1" value="0" orient="vertical" />
-                    <span>3.6kHz</span>
-                </div>
-                <div class="eq-band">
-                    <input type="range" class="eq-slider" data-index="4" min="-12" max="12" step="0.1" value="0" orient="vertical" />
-                    <span>14kHz</span>
-                </div>
-            </div>
-
-            <div class="preset-row" id="preset-row">
-                <button class="preset-chip active" data-preset="flat">Flat</button>
-                <button class="preset-chip" data-preset="bass">Bass</button>
-                <button class="preset-chip" data-preset="voice">Voice</button>
-                <button class="preset-chip" data-preset="night">Night</button>
-                <button class="preset-chip" data-preset="boost">Boost</button>
-                <button class="preset-chip" data-preset="clear">Clear</button>
-            </div>
-
-            <div class="volume-row">
-                <div class="volume-label">Volume</div>
-                <input id="master-volume" class="slider-horizontal" type="range" min="0" max="100" value="80" />
-                <div id="volume-value" class="volume-value">80%</div>
-            </div>
-        </div>
-
-        <div class="panel-block">
-            <h3>Signal Metadata</h3>
-            <div class="meta-grid">
-                <div class="meta-card">
-                    <span class="meta-label">Station</span>
-                    <strong id="meta-station-name">No station selected</strong>
-                </div>
-                <div class="meta-card">
-                    <span class="meta-label">Country</span>
-                    <strong id="meta-country">-</strong>
-                </div>
-                <div class="meta-card">
-                    <span class="meta-label">Genre</span>
-                    <strong id="meta-genre">-</strong>
-                </div>
-                <div class="meta-card">
-                    <span class="meta-label">Bitrate</span>
-                    <strong id="meta-bitrate">-</strong>
-                </div>
-            </div>
-
-            <div class="metadata-sheet">
-                <div class="metadata-item">
-                    <span class="k">Codec</span>
-                    <span class="v" id="meta-codec">-</span>
-                </div>
-                <div class="metadata-item">
-                    <span class="k">Status</span>
-                    <span class="v" id="meta-status">Idle</span>
-                </div>
-                <div class="metadata-item">
-                    <span class="k">Source</span>
-                    <span class="v" id="meta-source">-</span>
-                </div>
-                <div class="metadata-item">
-                    <span class="k">Listener Count</span>
-                    <span class="v" id="meta-listeners">-</span>
-                </div>
-            </div>
-
-            <div class="hud-pill" id="station-health-pill">Network Stable</div>
-        </div>
-
-        <div class="bottom-panels">
-            <div class="panel-block">
-                <h3>Favorites</h3>
-                <ul id="favorites-list" class="favorites-list">
-                    <li>No favorites yet.</li>
-                </ul>
-            </div>
-
-            <div class="panel-block">
-                <h3>Queue</h3>
-                <ul id="queue-list" class="queue-list">
-                    <li>Queue empty.</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="panel-block">
-            <h3>History</h3>
-            <ul id="history-list" class="history-list">
-                <li>Nothing played yet.</li>
-            </ul>
-        </div>
-
-        <div class="panel-block">
-            <h3>Notices</h3>
-            <ul class="notices-list">
-                <li>Browser-native, local-first playback</li>
-                <li>Live metadata refresh enabled</li>
-                <li>Favorites and last station persist</li>
-            </ul>
-        </div>
-
-        <div class="panel-block">
-            <h3>Manual</h3>
-            <ul class="manual-list">
-                <li><a href="#" data-open-modal="about">About TMW-RP</a></li>
-                <li><a href="#" data-open-modal="shortcuts">Keyboard shortcuts</a></li>
-                <li><a href="#" data-open-modal="troubleshooting">Troubleshooting</a></li>
-            </ul>
-        </div>
-    </aside>
-
-    <main class="stage">
-        <div class="stage-inner">
-            <section class="now-playing">
-                <div class="live-pill-row">
-                    <span class="live-pill">Live</span>
-                    <span class="stream-title" id="stream-title">No stream loaded</span>
-                </div>
-                <h2 id="now-playing-title">Waiting for a signal</h2>
-                <p class="subtitle" id="now-playing-subtitle">Ready for discovery, playback, and metadata streaming.</p>
-            </section>
-
-            <div class="visualizer-wrap">
-                <canvas id="visualizer-canvas" width="1200" height="420"></canvas>
-            </div>
-
-            <div class="feature-strip" id="feature-strip">
-                <button class="feature-chip active" data-visualizer="spectrum">Spectrum</button>
-                <button class="feature-chip" data-visualizer="wave">Waveform</button>
-                <button class="feature-chip" data-visualizer="radial">Radial</button>
-            </div>
-
-            <div class="advanced-rail">
-                <div class="insight-panel">
-                    <h4>Signal Diagnostics</h4>
-                    <div class="insight-grid">
-                        <div class="insight-stat">
-                            <strong id="diag-buffer">0%</strong>
-                            <span>Buffer</span>
-                        </div>
-                        <div class="insight-stat">
-                            <strong id="diag-snr">--</strong>
-                            <span>SNR</span>
-                        </div>
-                        <div class="insight-stat">
-                            <strong id="diag-latency">--</strong>
-                            <span>Latency</span>
-                        </div>
-                        <div class="insight-stat">
-                            <strong id="diag-quality">--</strong>
-                            <span>Quality</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="insight-panel">
-                    <h4>Session Insights</h4>
-                    <div class="insight-grid">
-                        <div class="insight-stat">
-                            <strong id="insight-playtime">00:00</strong>
-                            <span>Playtime</span>
-                        </div>
-                        <div class="insight-stat">
-                            <strong id="insight-stations">0</strong>
-                            <span>Stations</span>
-                        </div>
-                        <div class="insight-stat">
-                            <strong id="insight-favorites">0</strong>
-                            <span>Favorites</span>
-                        </div>
-                        <div class="insight-stat">
-                            <strong id="insight-mode">Idle</strong>
-                            <span>Mode</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="professional-toolbar">
-                <button id="btn-retry" class="toolbar-btn">Reconnect</button>
-                <button id="btn-toggle-hud" class="toolbar-btn">HUD Mode</button>
-                <button id="btn-theme" class="toolbar-btn">Theme</button>
-                <button id="btn-refresh-meta" class="toolbar-btn">Refresh Meta</button>
-                <button id="btn-queue-next" class="toolbar-btn">Play Next</button>
-            </div>
-
-            <div class="brand-bar">
-                <span>Broadcast Engine</span>
-                <strong id="brand-status">Standby</strong>
-            </div>
-        </div>
-    </main>
-
-    <div id="toast" class="toast" aria-live="polite"></div>
-
-    <div class="hud-overlay hidden" id="hud-overlay">
-        <div class="hud-overlay-top">
-            <div class="hud-live">Live</div>
-            <div class="hud-title" id="hud-title">No stream loaded</div>
-        </div>
-
-        <div class="hud-metrics">
-            <div class="hud-stat">
-                <strong id="hud-buffer">0%</strong>
-                <span>Buffer</span>
-            </div>
-            <div class="hud-stat">
-                <strong id="hud-latency">--</strong>
-                <span>Latency</span>
-            </div>
-            <div class="hud-stat">
-                <strong id="hud-quality">--</strong>
-                <span>Quality</span>
-            </div>
-        </div>
-
-        <div class="hud-canvas-wrap">
-            <canvas id="hud-canvas" width="360" height="76"></canvas>
-        </div>
+  <aside class="console">
+    <div class="brand-header">
+      <h1>📻 TMW-RP</h1>
+      <p>Web Radio Engine</p>
+      <div class="brand-tagline">Local-first, browser-native, always open</div>
     </div>
 
-    <div id="modal-overlay" class="modal-overlay hidden" aria-hidden="true">
-        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-            <div class="modal-header">
-                <h2 id="modal-title">About TMW-RP</h2>
-                <button class="modal-close" id="modal-close">Close</button>
-            </div>
-            <div class="modal-body" id="modal-body"></div>
-        </div>
+    <div class="control-group">
+      <label>Discovery Source</label>
+      <select id="registry-base">
+        <option value="radiobrowser">Radio Browser (Decentralized)</option>
+        <option value="custom-url">Direct Stream URL</option>
+        <option value="csv">CSV / Playlist Import</option>
+      </select>
     </div>
 
-    <script>
-        (function () {
-            "use strict";
+    <div class="control-group">
+      <label>Search & Filter</label>
+      <input type="text" id="search-query" placeholder="Artist, genre, country, or station..." />
+      <input type="text" id="custom-url-input" class="hidden" placeholder="Paste stream URL (MP3, AAC, M3U8)" />
+      <div class="row">
+        <button id="btn-query">Search</button>
+        <button id="btn-clear-search" class="btn-secondary btn-sm">Clear</button>
+      </div>
+    </div>
 
-            const STORAGE_KEYS = {
-                favorites: "tmw_rp_favorites_v1",
-                queue: "tmw_rp_queue_v1",
-                history: "tmw_rp_history_v1",
-                theme: "tmw_rp_theme_v1",
-                eq: "tmw_rp_eq_v1",
-                volume: "tmw_rp_volume_v1",
-                lastStation: "tmw_rp_last_station_v1"
-            };
+    <div class="control-group">
+      <label>Station Selector</label>
+      <select id="target-station">
+        <option value="">Choose a station...</option>
+      </select>
+    </div>
 
-            const state = {
-                selectedSource: "radiobrowser",
-                stations: [],
-                favorites: [],
-                queue: [],
-                history: [],
-                currentStation: null,
-                currentStreamUrl: "",
-                playing: false,
-                metadataTimer: null,
-                isAudioReady: false,
-                audioContext: null,
-                mediaSource: null,
-                gainNode: null,
-                eqNodes: [],
-                visualizerMode: "spectrum",
-                currentTheme: "dark",
-                lastStationUrl: "",
-                currentPreset: "flat",
-                brightness: 0,
-                timeStartedAt: null,
-                playSeconds: 0,
-                audioEl: null,
-                audioInitialized: false,
-                connectionChecks: [],
-                stationHealth: "Network Stable",
-                currentSNR: 0,
-                currentLatency: 0,
-                currentQuality: 0,
-                currentBuffer: 0
-            };
+    <div class="row">
+      <button id="btn-play" class="btn-primary">Play</button>
+      <button id="btn-stop" class="btn-danger">Stop</button>
+    </div>
 
-            const modalMap = {
-                about: [
-                    "TMW-RP is a browser-native radio engine designed for local-first playback.",
-                    "It supports direct URLs, Radio Browser discovery, CSV and playlist loading, EQ presets, metadata updates, favorites, and live visualizations.",
-                    "Everything runs in a single HTML artifact with no backend required."
-                ],
-                shortcuts: [
-                    "Space — Play / Pause",
-                    "S — Stop playback",
-                    "F — Toggle favorite",
-                    "Q — Queue current station",
-                    "M — Toggle HUD mode",
-                    "T — Toggle theme",
-                    "ArrowUp / ArrowDown — Volume",
-                    "N — Next in queue",
-                    "R — Reconnect / retry"
-                ],
-                troubleshooting: [
-                    "If the stream fails to play, try a different source or use a direct stream URL.",
-                    "For browser restrictions, verify the stream is CORS-friendly or served over HTTPS.",
-                    "Some stations block autoplay; pressing Engage Link usually resets them.",
-                    "If metadata does not update, use Refresh Meta or switch to a different station."
-                ]
-            };
+    <div class="row">
+      <button id="btn-favorite" class="btn-secondary btn-sm">♥ Add</button>
+      <button id="btn-queue" class="btn-secondary btn-sm">⬕ Queue</button>
+      <button id="btn-next-queue" class="btn-secondary btn-sm">Next</button>
+    </div>
 
-            const defaultEQ = [0, 0, 0, 0, 0];
-            const presetMap = {
-                flat: [0, 0, 0, 0, 0],
-                bass: [4, 3.5, 1.5, 0, -1],
-                voice: [0, 1.5, 2.5, 2.2, 0.8],
-                night: [-2, -1.5, 0, 1.2, 2.2],
-                boost: [5, 4, 2.5, 1.5, 3],
-                clear: [0.8, 0.2, -0.5, 1.4, 2.2]
-            };
+    <div class="panel-block">
+      <h3>⏰ Scheduler</h3>
+      <div class="scheduler-ui">
+        <div class="scheduler-row">
+          <input type="time" id="schedule-time" />
+          <select id="schedule-action">
+            <option value="play">Play</option>
+            <option value="stop">Stop</option>
+            <option value="preset">Load Preset</option>
+          </select>
+          <button id="btn-add-schedule" class="btn-sm" style="width: 60px;">Add</button>
+        </div>
+        <div class="timer-display" id="next-schedule-info">No scheduled events</div>
+        <ul id="scheduler-list" class="scheduler-list">
+          <li>No schedules set.</li>
+        </ul>
+      </div>
+    </div>
 
-            const elements = {};
-            const radioBrowserBase = "https://de1.api.radio-browser.info/json/stations";
+    <div class="control-group" style="margin-top: 12px;">
+      <label>5-Band Equalizer</label>
+      <div class="eq-matrix" id="eq-matrix">
+        <div class="eq-band">
+          <input type="range" class="eq-slider" data-index="0" min="-12" max="12" step="0.1" value="0" orient="vertical" />
+          <span>60Hz</span>
+        </div>
+        <div class="eq-band">
+          <input type="range" class="eq-slider" data-index="1" min="-12" max="12" step="0.1" value="0" orient="vertical" />
+          <span>230Hz</span>
+        </div>
+        <div class="eq-band">
+          <input type="range" class="eq-slider" data-index="2" min="-12" max="12" step="0.1" value="0" orient="vertical" />
+          <span>910Hz</span>
+        </div>
+        <div class="eq-band">
+          <input type="range" class="eq-slider" data-index="3" min="-12" max="12" step="0.1" value="0" orient="vertical" />
+          <span>3.6kHz</span>
+        </div>
+        <div class="eq-band">
+          <input type="range" class="eq-slider" data-index="4" min="-12" max="12" step="0.1" value="0" orient="vertical" />
+          <span>14kHz</span>
+        </div>
+      </div>
 
-            function init() {
-                cacheElements();
-                loadStoredState();
-                bindEvents();
-                setTheme(state.currentTheme);
-                installAudio();
-                applyEqPreset("flat");
-                updateInsightStats();
-                updateBrandStatus("Standby");
-                updateMetadataCard();
-                setCurrentTitle("Waiting for a signal");
-                showToast("TMW-RP ready", 1800);
-                refreshSearchResults();
-                hydrateStationList();
-                setInterval(() => {
-                    if (state.playing && state.audioEl && !state.audioEl.paused) {
-                        state.playSeconds += 1;
-                        updatePlaytime();
-                    }
-                }, 1000);
+      <div class="preset-row" id="preset-row">
+        <button class="preset-chip active" data-preset="flat">Flat</button>
+        <button class="preset-chip" data-preset="bass">Bass</button>
+        <button class="preset-chip" data-preset="voice">Voice</button>
+        <button class="preset-chip" data-preset="night">Night</button>
+        <button class="preset-chip" data-preset="boost">Boost</button>
+        <button class="preset-chip" data-preset="clear">Clear</button>
+      </div>
 
-                setInterval(() => {
-                    if (state.playing) {
-                        updateSignalDiagnostics();
-                    }
-                }, 3000);
+      <div class="volume-row">
+        <div class="volume-label">Volume</div>
+        <input id="master-volume" class="slider-horizontal" type="range" min="0" max="100" value="80" />
+        <div id="volume-value" class="volume-value">80%</div>
+      </div>
+    </div>
+
+    <div class="panel-block">
+      <h3>📡 Metadata</h3>
+      <div class="meta-grid">
+        <div class="meta-card">
+          <span class="meta-label">Station</span>
+          <strong id="meta-station-name">No station</strong>
+        </div>
+        <div class="meta-card">
+          <span class="meta-label">Country</span>
+          <strong id="meta-country">-</strong>
+        </div>
+        <div class="meta-card">
+          <span class="meta-label">Genre</span>
+          <strong id="meta-genre">-</strong>
+        </div>
+        <div class="meta-card">
+          <span class="meta-label">Bitrate</span>
+          <strong id="meta-bitrate">-</strong>
+        </div>
+      </div>
+
+      <div class="metadata-sheet">
+        <div class="metadata-item">
+          <span class="k">Codec</span>
+          <span class="v" id="meta-codec">-</span>
+        </div>
+        <div class="metadata-item">
+          <span class="k">Status</span>
+          <span class="v" id="meta-status">Idle</span>
+        </div>
+        <div class="metadata-item">
+          <span class="k">Listeners</span>
+          <span class="v" id="meta-listeners">-</span>
+        </div>
+        <div class="metadata-item">
+          <span class="k">Uptime</span>
+          <span class="v" id="meta-uptime">-</span>
+        </div>
+      </div>
+
+      <div class="hud-pill" id="station-health-pill">Ready</div>
+    </div>
+
+    <div class="bottom-panels">
+      <div class="panel-block">
+        <h3>❤️ Favorites</h3>
+        <div class="list-wrapper">
+          <ul id="favorites-list" class="favorites-list">
+            <li>None saved.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel-block">
+        <h3>⬕ Queue</h3>
+        <div class="list-wrapper">
+          <ul id="queue-list" class="queue-list">
+            <li>Empty.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-block">
+      <h3>📜 History</h3>
+      <div class="list-wrapper">
+        <ul id="history-list" class="history-list">
+          <li>Nothing played.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel-block">
+      <h3>💡 Resources</h3>
+      <ul class="manual-list">
+        <li><a href="#" data-open-modal="about">About TMW-RP</a></li>
+        <li><a href="#" data-open-modal="shortcuts">Keyboard Help</a></li>
+        <li><a href="#" data-open-modal="troubleshooting">Troubleshooting</a></li>
+        <li><a href="#" data-open-modal="stats">Session Stats</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="stage-inner">
+      <section class="now-playing">
+        <div class="live-pill-row">
+          <span class="live-pill" id="stream-status">Ready</span>
+          <span class="stream-title" id="stream-title">No stream loaded</span>
+        </div>
+        <h2 id="now-playing-title">Waiting for a signal</h2>
+        <p class="subtitle" id="now-playing-subtitle">Local-first playback engine • Zero tracking • Open standards</p>
+        <div class="time-display" id="time-display">--</div>
+      </section>
+
+      <div class="visualizer-wrap">
+        <canvas id="visualizer-canvas" width="1200" height="420"></canvas>
+      </div>
+
+      <div class="feature-strip" id="feature-strip">
+        <button class="feature-chip active" data-visualizer="spectrum">Spectrum</button>
+        <button class="feature-chip" data-visualizer="wave">Waveform</button>
+        <button class="feature-chip" data-visualizer="radial">Radial</button>
+      </div>
+
+      <div class="advanced-rail">
+        <div class="insight-panel">
+          <h4>🔍 Signal Health</h4>
+          <div class="insight-grid">
+            <div class="insight-stat">
+              <strong id="diag-buffer">0%</strong>
+              <span>Buffer</span>
+            </div>
+            <div class="insight-stat">
+              <strong id="diag-snr">—</strong>
+              <span>SNR</span>
+            </div>
+            <div class="insight-stat">
+              <strong id="diag-latency">—</strong>
+              <span>Latency</span>
+            </div>
+            <div class="insight-stat">
+              <strong id="diag-quality">—</strong>
+              <span>Quality</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="insight-panel">
+          <h4>📊 Session</h4>
+          <div class="insight-grid">
+            <div class="insight-stat">
+              <strong id="insight-playtime">00:00</strong>
+              <span>Playtime</span>
+            </div>
+            <div class="insight-stat">
+              <strong id="insight-stations">0</strong>
+              <span>Scanned</span>
+            </div>
+            <div class="insight-stat">
+              <strong id="insight-favorites">0</strong>
+              <span>Favorites</span>
+            </div>
+            <div class="insight-stat">
+              <strong id="insight-uptime">00:00</strong>
+              <span>Uptime</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="professional-toolbar">
+        <button id="btn-retry" class="toolbar-btn">↻ Retry</button>
+        <button id="btn-toggle-hud" class="toolbar-btn">HUD</button>
+        <button id="btn-theme" class="toolbar-btn">☀️ Theme</button>
+        <button id="btn-refresh-meta" class="toolbar-btn">Refresh</button>
+        <button id="btn-copy-url" class="toolbar-btn">Copy URL</button>
+        <button id="btn-export" class="toolbar-btn">Export</button>
+      </div>
+
+      <div class="brand-bar">
+        <span>Engine</span>
+        <strong id="brand-status">Standby</strong>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <div class="hud-overlay hidden" id="hud-overlay">
+    <div class="hud-overlay-top">
+      <div class="hud-live">Live</div>
+      <div class="hud-title" id="hud-title">No stream</div>
+    </div>
+
+    <div class="hud-metrics">
+      <div class="hud-stat">
+        <strong id="hud-buffer">0%</strong>
+        <span>Buffer</span>
+      </div>
+      <div class="hud-stat">
+        <strong id="hud-latency">—</strong>
+        <span>Latency</span>
+      </div>
+      <div class="hud-stat">
+        <strong id="hud-quality">—</strong>
+        <span>Quality</span>
+      </div>
+    </div>
+
+    <div class="hud-canvas-wrap">
+      <canvas id="hud-canvas" width="360" height="72"></canvas>
+    </div>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h2 id="modal-title">Modal Title</h2>
+        <button class="modal-close" id="modal-close">Close</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const STORAGE_KEYS = {
+        favorites: "tmw_rp_fav_v2",
+        queue: "tmw_rp_queue_v2",
+        history: "tmw_rp_hist_v2",
+        theme: "tmw_rp_theme_v2",
+        eq: "tmw_rp_eq_v2",
+        volume: "tmw_rp_vol_v2",
+        lastStation: "tmw_rp_last_v2",
+        schedules: "tmw_rp_sched_v2",
+        sessionStart: "tmw_rp_start_v2"
+      };
+
+      const state = {
+        selectedSource: "radiobrowser",
+        stations: [],
+        favorites: [],
+        queue: [],
+        history: [],
+        schedules: [],
+        currentStation: null,
+        currentStreamUrl: "",
+        playing: false,
+        isAudioReady: false,
+        audioContext: null,
+        mediaSource: null,
+        gainNode: null,
+        eqNodes: [],
+        visualizerMode: "spectrum",
+        currentTheme: "dark",
+        lastStationUrl: "",
+        currentPreset: "flat",
+        eqValues: [0, 0, 0, 0, 0],
+        currentVolume: 80,
+        playSeconds: 0,
+        sessionUptime: 0,
+        audioEl: null,
+        sessionStartTime: Date.now(),
+        radioBrowserAPI: "https://de1.api.radio-browser.info/json",
+        activeSchedule: null
+      };
+
+      const modalMap = {
+        about: [
+          "TMW-RP is a browser-native, local-first radio engine.",
+          "Features: Radio Browser integration, EQ presets, live visualizers, favorites, scheduling, and zero telemetry.",
+          "All data stays on your device. No cloud sync, no tracking.",
+          "Built for clarity, respect, and pure audio pleasure."
+        ],
+        shortcuts: [
+          "Space — Play/Pause | S — Stop | F — Favorite",
+          "Q — Queue | M — HUD Mode | T — Toggle Theme",
+          "↑/↓ — Volume | N — Next Queue | R — Reconnect",
+          "C — Copy Stream URL | E — Export Data"
+        ],
+        troubleshooting: [
+          "Stream fails? Try a different source or direct URL.",
+          "CORS blocking? Some streams require HTTPS or CORS headers.",
+          "Autoplay blocked? Browser privacy rules — click Play again.",
+          "Metadata not updating? Use Refresh or switch stations.",
+          "Audio cuts out? Check buffer percentage in Signal Health panel."
+        ],
+        stats: [
+          "Session Uptime: Measured from page load.",
+          "Playback Time: Actual listening duration.",
+          "Stations Scanned: Total unique stations queried.",
+          "Favorites: Persistent across sessions.",
+          "Schedules: Stored locally, timezone-aware.",
+          "Data Format: All JSON, exportable as .json files."
+        ]
+      };
+
+      const defaultEQ = [0, 0, 0, 0, 0];
+      const presetMap = {
+        flat: [0, 0, 0, 0, 0],
+        bass: [5, 4, 1.5, 0, -2],
+        voice: [0, 1.5, 3, 2.2, 0.8],
+        night: [-2, -1.5, 0.5, 1.5, 2.5],
+        boost: [6, 5, 3, 2, 4],
+        clear: [1, 0.5, -0.8, 1.5, 2.5]
+      };
+
+      const elements = {};
+
+      function init() {
+        cacheElements();
+        loadStoredState();
+        bindEvents();
+        setTheme(state.currentTheme);
+        installAudio();
+        applyEqPreset("flat");
+        updateInsightStats();
+        updateBrandStatus("Standby");
+        updateMetadataCard();
+        setCurrentTitle("Waiting for a signal");
+        showToast("TMW-RP ready", 1600);
+        startSessionTimers();
+        hydrateStations();
+        scheduleNextEvent();
+
+        setInterval(updateTimeDisplay, 1000);
+        setInterval(() => {
+          if (state.playing) {
+            updateSignalDiagnostics();
+          }
+        }, 2000);
+        setInterval(checkSchedules, 5000);
+      }
+
+      function cacheElements() {
+        elements.registryBase = document.getElementById("registry-base");
+        elements.searchQuery = document.getElementById("search-query");
+        elements.customUrlInput = document.getElementById("custom-url-input");
+        elements.targetStation = document.getElementById("target-station");
+        elements.btnQuery = document.getElementById("btn-query");
+        elements.btnClearSearch = document.getElementById("btn-clear-search");
+        elements.btnPlay = document.getElementById("btn-play");
+        elements.btnStop = document.getElementById("btn-stop");
+        elements.btnFavorite = document.getElementById("btn-favorite");
+        elements.btnQueue = document.getElementById("btn-queue");
+        elements.btnNextQueue = document.getElementById("btn-next-queue");
+        elements.btnRetry = document.getElementById("btn-retry");
+        elements.btnToggleHud = document.getElementById("btn-toggle-hud");
+        elements.btnTheme = document.getElementById("btn-theme");
+        elements.btnRefreshMeta = document.getElementById("btn-refresh-meta");
+        elements.btnCopyUrl = document.getElementById("btn-copy-url");
+        elements.btnExport = document.getElementById("btn-export");
+        elements.masterVolume = document.getElementById("master-volume");
+        elements.volumeValue = document.getElementById("volume-value");
+        elements.nowPlayingTitle = document.getElementById("now-playing-title");
+        elements.nowPlayingSubtitle = document.getElementById("now-playing-subtitle");
+        elements.streamTitle = document.getElementById("stream-title");
+        elements.streamStatus = document.getElementById("stream-status");
+        elements.timeDisplay = document.getElementById("time-display");
+        elements.visualizerCanvas = document.getElementById("visualizer-canvas");
+        elements.hudCanvas = document.getElementById("hud-canvas");
+        elements.toast = document.getElementById("toast");
+        elements.hudOverlay = document.getElementById("hud-overlay");
+        elements.modalOverlay = document.getElementById("modal-overlay");
+        elements.modalBody = document.getElementById("modal-body");
+        elements.modalTitle = document.getElementById("modal-title");
+        elements.modalClose = document.getElementById("modal-close");
+        elements.brandStatus = document.getElementById("brand-status");
+        elements.stationHealthPill = document.getElementById("station-health-pill");
+        elements.metaStationName = document.getElementById("meta-station-name");
+        elements.metaCountry = document.getElementById("meta-country");
+        elements.metaGenre = document.getElementById("meta-genre");
+        elements.metaBitrate = document.getElementById("meta-bitrate");
+        elements.metaCodec = document.getElementById("meta-codec");
+        elements.metaStatus = document.getElementById("meta-status");
+        elements.metaListeners = document.getElementById("meta-listeners");
+        elements.metaUptime = document.getElementById("meta-uptime");
+        elements.favoritesList = document.getElementById("favorites-list");
+        elements.queueList = document.getElementById("queue-list");
+        elements.historyList = document.getElementById("history-list");
+        elements.schedulerList = document.getElementById("scheduler-list");
+        elements.scheduleTime = document.getElementById("schedule-time");
+        elements.scheduleAction = document.getElementById("schedule-action");
+        elements.btnAddSchedule = document.getElementById("btn-add-schedule");
+        elements.nextScheduleInfo = document.getElementById("next-schedule-info");
+        elements.hudTitle = document.getElementById("hud-title");
+        elements.hudBuffer = document.getElementById("hud-buffer");
+        elements.hudLatency = document.getElementById("hud-latency");
+        elements.hudQuality = document.getElementById("hud-quality");
+        elements.diagBuffer = document.getElementById("diag-buffer");
+        elements.diagSNR = document.getElementById("diag-snr");
+        elements.diagLatency = document.getElementById("diag-latency");
+        elements.diagQuality = document.getElementById("diag-quality");
+        elements.insightPlaytime = document.getElementById("insight-playtime");
+        elements.insightStations = document.getElementById("insight-stations");
+        elements.insightFavorites = document.getElementById("insight-favorites");
+        elements.insightUptime = document.getElementById("insight-uptime");
+        elements.featureChips = Array.from(document.querySelectorAll(".feature-chip"));
+        elements.eqSliders = Array.from(document.querySelectorAll(".eq-slider"));
+        elements.presetChips = Array.from(document.querySelectorAll(".preset-chip"));
+        elements.modalLinks = Array.from(document.querySelectorAll("[data-open-modal]"));
+
+        elements.audio = document.createElement("audio");
+        elements.audio.crossOrigin = "anonymous";
+        elements.audio.preload = "auto";
+        elements.audio.autoplay = false;
+        elements.audio.controls = false;
+        document.body.appendChild(elements.audio);
+        state.audioEl = elements.audio;
+      }
+
+      function loadStoredState() {
+        try {
+          const favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.favorites) || "[]");
+          const queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.queue) || "[]");
+          const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || "[]");
+          const schedules = JSON.parse(localStorage.getItem(STORAGE_KEYS.schedules) || "[]");
+          const theme = localStorage.getItem(STORAGE_KEYS.theme) || "dark";
+          const volume = Number(localStorage.getItem(STORAGE_KEYS.volume) || "80");
+          const eq = JSON.parse(localStorage.getItem(STORAGE_KEYS.eq) || "null");
+
+          state.favorites = Array.isArray(favorites) ? favorites : [];
+          state.queue = Array.isArray(queue) ? queue : [];
+          state.history = Array.isArray(history) ? history : [];
+          state.schedules = Array.isArray(schedules) ? schedules : [];
+          state.currentTheme = ["dark", "light"].includes(theme) ? theme : "dark";
+          state.currentVolume = isNaN(volume) ? 80 : clamp(volume, 0, 100);
+          state.eqValues = (Array.isArray(eq) && eq.length === 5) ? eq.map(Number) : defaultEQ.slice();
+        } catch (err) {
+          state.favorites = [];
+          state.queue = [];
+          state.history = [];
+          state.schedules = [];
+          state.eqValues = defaultEQ.slice();
+          state.currentTheme = "dark";
+          state.currentVolume = 80;
+        }
+
+        elements.masterVolume.value = String(state.currentVolume);
+        elements.volumeValue.textContent = `${Math.round(state.currentVolume)}%`;
+      }
+
+      function bindEvents() {
+        elements.registryBase.addEventListener("change", function () {
+          state.selectedSource = this.value;
+          toggleSourceControls();
+        });
+
+        elements.btnQuery.addEventListener("click", performSearch);
+        elements.btnClearSearch.addEventListener("click", () => {
+          elements.searchQuery.value = "";
+          hydrateStations();
+        });
+
+        elements.btnPlay.addEventListener("click", playCurrentStation);
+        elements.btnStop.addEventListener("click", stopPlayback);
+        elements.btnFavorite.addEventListener("click", toggleFavoriteCurrentStation);
+        elements.btnQueue.addEventListener("click", queueCurrentStation);
+        elements.btnNextQueue.addEventListener("click", playNextInQueue);
+        elements.btnRetry.addEventListener("click", retryCurrentStream);
+        elements.btnToggleHud = elements.btnToggleHud || { addEventListener: function(){} };
+        elements.btnTheme = elements.btnTheme || { addEventListener: function(){} };
+        elements.btnRefreshMeta = elements.btnRefreshMeta || { addEventListener: function(){} };
+        elements.btnCopyUrl = elements.btnCopyUrl || { addEventListener: function(){} };
+        elements.btnExport = elements.btnExport || { addEventListener: function(){} };
+
+        if (elements.btnToggleHud && elements.btnToggleHud.addEventListener) {
+          elements.btnToggleHud.addEventListener("click", toggleHud);
+        }
+        if (elements.btnTheme && elements.btnTheme.addEventListener) {
+          elements.btnTheme.addEventListener("click", toggleTheme);
+        }
+        if (elements.btnRefreshMeta && elements.btnRefreshMeta.addEventListener) {
+          elements.btnRefreshMeta.addEventListener("click", refreshMetadataNow);
+        }
+        if (elements.btnCopyUrl && elements.btnCopyUrl.addEventListener) {
+          elements.btnCopyUrl.addEventListener("click", copyStreamUrl);
+        }
+        if (elements.btnExport && elements.btnExport.addEventListener) {
+          elements.btnExport.addEventListener("click", exportData);
+        }
+
+        elements.btnAddSchedule.addEventListener("click", addScheduleEvent);
+
+        elements.targetStation.addEventListener("change", function () {
+          if (!this.value) return;
+          const found = state.stations.find(s => (s.stationuuid || s.name) === this.value);
+          if (found) selectStation(found);
+        });
+
+        elements.masterVolume.addEventListener("input", function () {
+          const value = Number(this.value);
+          state.currentVolume = clamp(value, 0, 100);
+          elements.volumeValue.textContent = `${Math.round(state.currentVolume)}%`;
+          localStorage.setItem(STORAGE_KEYS.volume, String(state.currentVolume));
+          if (state.audioEl) state.audioEl.volume = state.currentVolume / 100;
+          if (state.gainNode) state.gainNode.gain.value = state.currentVolume / 100;
+        });
+
+        elements.eqSliders.forEach(slider => {
+          slider.addEventListener("input", function () {
+            const index = Number(this.dataset.index);
+            state.eqValues[index] = Number(this.value);
+            applyEqPreset(null);
+            saveEqToStorage();
+          });
+        });
+
+        elements.presetChips.forEach(chip => {
+          chip.addEventListener("click", function () {
+            const preset = this.dataset.preset;
+            applyEqPreset(preset);
+          });
+        });
+
+        elements.featureChips.forEach(chip => {
+          chip.addEventListener("click", function () {
+            state.visualizerMode = this.dataset.visualizer;
+            elements.featureChips.forEach(item => item.classList.toggle("active", item === this));
+          });
+        });
+
+        elements.modalClose.addEventListener("click", closeModal);
+        elements.modalOverlay.addEventListener("click", event => {
+          if (event.target === elements.modalOverlay) closeModal();
+        });
+
+        elements.modalLinks.forEach(link => {
+          link.addEventListener("click", event => {
+            event.preventDefault();
+            openModal(this.dataset.openModal);
+          });
+        });
+
+        document.addEventListener("keydown", handleKeyboardShortcuts);
+      }
+
+      function toggleSourceControls() {
+        const show = state.selectedSource === "custom-url";
+        elements.customUrlInput.classList.toggle("hidden", !show);
+        if (!show) elements.customUrlInput.value = "";
+      }
+
+      function performSearch() {
+        const query = (elements.searchQuery.value || "").trim();
+        if (!query) {
+          hydrateStations();
+          return;
+        }
+
+        const encoded = encodeURIComponent(query);
+        const url = `${state.radioBrowserAPI}/stations/search?name=${encoded}&hidebroken=true&limit=50&order=votes&reverse=true`;
+
+        fetchJson(url)
+          .then(data => {
+            state.stations = Array.isArray(data) ? data : [];
+            renderTargetStations();
+            if (state.stations.length) {
+              selectStation(state.stations[0]);
+              showToast(`Found ${state.stations.length} stations`, 1200);
+            } else {
+              showToast("No results. Try a broader search.", 1600);
+            }
+          })
+          .catch(() => {
+            showToast("Search failed. Check your connection.", 1800);
+          });
+      }
+
+      function hydrateStations() {
+        const url = `${state.radioBrowserAPI}/stations?limit=30&hidebroken=true&order=votes&reverse=true`;
+        fetchJson(url)
+          .then(data => {
+            state.stations = Array.isArray(data) ? data : [];
+            renderTargetStations();
+            if (state.stations.length) selectStation(state.stations[0]);
+            updateInsightStats();
+          })
+          .catch(() => {
+            showToast("Failed to load stations", 1800);
+          });
+      }
+
+      function renderTargetStations() {
+        const options = ['<option value="">Choose a station...</option>'];
+        state.stations.forEach(station => {
+          const name = escapeHtml(station.name || "Unnamed");
+          const value = station.stationuuid || station.name || name;
+          options.push(`<option value="${escapeHtml(String(value))}">${name}</option>`);
+        });
+        elements.targetStation.innerHTML = options.join("");
+      }
+
+      function selectStation(station) {
+        if (!station) return;
+        state.currentStation = station;
+        state.currentStreamUrl = station.url || station.urlResolved || "";
+
+        const meta = {
+          stationName: station.name || "Station",
+          country: station.country || "Unknown",
+          genre: station.tags || station.genre || "Various",
+          bitrate: station.bitrate || "—",
+          codec: station.codec || detectCodecFromUrl(state.currentStreamUrl) || "Unknown",
+          listeners: station.listeners || "—",
+          uptime: station.lastcheckok ? "99%+" : "Unknown"
+        };
+
+        elements.metaStationName.textContent = meta.stationName;
+        elements.metaCountry.textContent = meta.country;
+        elements.metaGenre.textContent = meta.genre;
+        elements.metaBitrate.textContent = meta.bitrate;
+        elements.metaCodec.textContent = meta.codec;
+        elements.metaListeners.textContent = meta.listeners;
+        elements.metaUptime.textContent = meta.uptime;
+        elements.streamTitle.textContent = meta.stationName;
+        elements.hudTitle.textContent = meta.stationName;
+        setCurrentTitle(meta.stationName);
+        setSubtitle(`${meta.country} • ${meta.genre}`);
+
+        updateMetadataCard();
+        ensureStationInHistory(station);
+        updateInsightStats();
+      }
+
+      function setCurrentTitle(title) {
+        elements.nowPlayingTitle.textContent = title || "Waiting...";
+        elements.hudTitle.textContent = title || "No stream";
+      }
+
+      function setSubtitle(value) {
+        elements.nowPlayingSubtitle.textContent = value || "Ready for discovery.";
+      }
+
+      function installAudio() {
+        state.audioEl.volume = (state.currentVolume || 80) / 100;
+        state.audioEl.preload = "auto";
+
+        state.audioEl.addEventListener("loadstart", () => {
+          updateBrandStatus("Connecting...");
+          elements.streamStatus.textContent = "Connecting";
+        });
+
+        state.audioEl.addEventListener("canplay", () => {
+          state.isAudioReady = true;
+          updateBrandStatus("Ready");
+          elements.streamStatus.textContent = "Ready";
+          showToast("Signal ready", 900);
+        });
+
+        state.audioEl.addEventListener("playing", () => {
+          state.playing = true;
+          updateBrandStatus("🔴 Live");
+          elements.streamStatus.textContent = "Playing";
+          updateInsightStats();
+        });
+
+        state.audioEl.addEventListener("pause", () => {
+          state.playing = false;
+          updateBrandStatus("Paused");
+          elements.streamStatus.textContent = "Paused";
+        });
+
+        state.audioEl.addEventListener("ended", () => {
+          state.playing = false;
+          updateBrandStatus("Ended");
+          showToast("Stream ended", 1400);
+        });
+
+        state.audioEl.addEventListener("error", () => {
+          state.playing = false;
+          updateBrandStatus("Error");
+          elements.streamStatus.textContent = "Error";
+          showToast("Playback error. Retrying...", 1800);
+        });
+
+        state.audioEl.addEventListener("timeupdate", () => {
+          if (state.audioEl && isFinite(state.audioEl.currentTime)) {
+            updatePlaytime();
+          }
+        });
+
+        connectAudioGraph();
+      }
+
+      function connectAudioGraph() {
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (!AudioCtx) return;
+
+          if (!state.audioContext) {
+            state.audioContext = new AudioCtx();
+          }
+
+          if (state.audioContext.state === "suspended") {
+            state.audioContext.resume();
+          }
+
+          if (!state.gainNode) {
+            state.gainNode = state.audioContext.createGain();
+            state.gainNode.gain.value = (state.currentVolume || 80) / 100;
+          }
+
+          if (!state.mediaSource && state.audioEl) {
+            state.mediaSource = state.audioContext.createMediaElementSource(state.audioEl);
+          }
+
+          const nodes = [];
+          let current = state.mediaSource;
+
+          for (let i = 0; i < 5; i++) {
+            const filter = state.audioContext.createBiquadFilter();
+            filter.type = "peaking";
+            filter.frequency.value = [60, 230, 910, 3600, 14000][i];
+            filter.Q.value = 1;
+            filter.gain.value = state.eqValues[i] || 0;
+            nodes.push(filter);
+          }
+
+          if (nodes.length) {
+            state.eqNodes = nodes;
+            current.connect(nodes[0]);
+            for (let i = 0; i < nodes.length - 1; i++) {
+              nodes[i].connect(nodes[i + 1]);
+            }
+            nodes[nodes.length - 1].connect(state.gainNode);
+          } else {
+            state.mediaSource.connect(state.gainNode);
+          }
+
+          state.gainNode.connect(state.audioContext.destination);
+        } catch (err) {
+          console.warn("Audio graph connection failed:", err);
+        }
+      }
+
+      function applyEqPreset(name) {
+        const presetName = name || state.currentPreset || "flat";
+        let values = presetMap[presetName] || presetMap.flat;
+
+        if (!name && state.eqValues && state.eqValues.length === 5) {
+          values = state.eqValues.slice();
+        }
+
+        state.currentPreset = presetName;
+
+        elements.presetChips.forEach(chip => {
+          const isActive = chip.dataset.preset === presetName;
+          chip.classList.toggle("active", isActive);
+        });
+
+        if (state.eqNodes.length) {
+          state.eqNodes.forEach((node, idx) => {
+            node.gain.value = values[idx];
+          });
+        }
+
+        elements.eqSliders.forEach((slider, idx) => {
+          slider.value = values[idx];
+        });
+
+        state.eqValues = values.slice();
+        saveEqToStorage();
+      }
+
+      function saveEqToStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEYS.eq, JSON.stringify(state.eqValues));
+        } catch (err) {}
+      }
+
+      function playCurrentStation() {
+        if (!state.currentStreamUrl) {
+          showToast("No stream URL. Choose a station.", 1500);
+          return;
+        }
+
+        const streamUrl = normalizeStreamUrl(state.currentStreamUrl);
+        if (!streamUrl) {
+          showToast("Invalid stream URL", 1600);
+          return;
+        }
+
+        if (!state.audioEl) installAudio();
+        if (state.audioContext && state.audioContext.state === "suspended") {
+          state.audioContext.resume();
+        }
+
+        if (state.audioEl.src !== streamUrl) {
+          state.audioEl.src = streamUrl;
+        }
+
+        state.audioEl.volume = (state.currentVolume || 80) / 100;
+        state.audioEl.play()
+          .then(() => {
+            state.playing = true;
+            updateBrandStatus("🔴 Live");
+            setCurrentTitle(state.currentStation && state.currentStation.name ? state.currentStation.name : "Playing");
+            updateInsightStats();
+            ensureStationInHistory(state.currentStation || { name: "Custom Stream", url: streamUrl });
+            showToast("Playback started", 1000);
+          })
+          .catch(() => {
+            showToast("Autoplay blocked. Click Play again.", 1800);
+            state.playing = false;
+          });
+      }
+
+      function stopPlayback() {
+        if (!state.audioEl) return;
+        state.audioEl.pause();
+        state.audioEl.currentTime = 0;
+        state.playing = false;
+        updateBrandStatus("Stopped");
+        showToast("Signal severed", 1000);
+      }
+
+      function retryCurrentStream() {
+        if (!state.currentStreamUrl) {
+          showToast("No stream to retry", 1400);
+          return;
+        }
+
+        if (state.audioEl) {
+          state.audioEl.src = "";
+          state.audioEl.load();
+          state.audioEl.src = normalizeStreamUrl(state.currentStreamUrl);
+          state.audioEl.play().catch(() => {
+            showToast("Retry blocked. User interaction required.", 1600);
+          });
+          updateBrandStatus("Retrying...");
+        }
+      }
+
+      function toggleFavoriteCurrentStation() {
+        if (!state.currentStation) {
+          showToast("Choose a station first", 1400);
+          return;
+        }
+
+        const id = state.currentStation.stationuuid || state.currentStation.name || state.currentStreamUrl;
+        const exists = state.favorites.some(item => {
+          const itemKey = item.stationuuid || item.name || item.url || "";
+          return itemKey === id;
+        });
+
+        if (exists) {
+          state.favorites = state.favorites.filter(item => {
+            const itemKey = item.stationuuid || item.name || item.url || "";
+            return itemKey !== id;
+          });
+          showToast("Removed from favorites", 1000);
+        } else {
+          state.favorites.push({
+            name: state.currentStation.name || "Custom Stream",
+            url: state.currentStreamUrl || "",
+            stationuuid: state.currentStation.stationuuid || String(Date.now()),
+            country: state.currentStation.country || "Unknown",
+            tags: state.currentStation.tags || ""
+          });
+          showToast("Added to favorites", 1000);
+        }
+
+        persistFavorites();
+        renderFavorites();
+        updateInsightStats();
+      }
+
+      function queueCurrentStation() {
+        if (!state.currentStation) {
+          showToast("Choose a station first", 1400);
+          return;
+        }
+
+        state.queue.push({
+          name: state.currentStation.name || "Custom Stream",
+          url: state.currentStreamUrl || "",
+          stationuuid: state.currentStation.stationuuid || String(Date.now())
+        });
+
+        persistQueue();
+        renderQueue();
+        showToast("Added to queue", 900);
+      }
+
+      function playNextInQueue() {
+        if (!state.queue.length) {
+          showToast("Queue empty", 1200);
+          return;
+        }
+
+        const next = state.queue.shift();
+        state.currentStation = {
+          name: next.name,
+          url: next.url,
+          stationuuid: next.stationuuid
+        };
+        state.currentStreamUrl = next.url;
+
+        persistQueue();
+        renderQueue();
+        playCurrentStation();
+      }
+
+      function renderFavorites() {
+        if (!state.favorites.length) {
+          elements.favoritesList.innerHTML = "<li>None saved.</li>";
+          return;
+        }
+
+        elements.favoritesList.innerHTML = state.favorites.map((item, idx) => {
+          const name = escapeHtml(item.name || `Favorite ${idx + 1}`);
+          return `<li data-fav-url="${escapeHtml(item.url)}" data-fav-name="${escapeHtml(name)}">${name}<button class="list-item-remove" type="button">✕</button></li>`;
+        }).join("");
+
+        elements.favoritesList.querySelectorAll("li").forEach((li, idx) => {
+          li.addEventListener("click", function (e) {
+            if (e.target.classList.contains("list-item-remove")) {
+              state.favorites.splice(idx, 1);
+              persistFavorites();
+              renderFavorites();
+              showToast("Removed", 700);
+              return;
             }
 
-            function cacheElements() {
-                elements.registryBase = document.getElementById("registry-base");
-                elements.searchQuery = document.getElementById("search-query");
-                elements.customUrlInput = document.getElementById("custom-url-input");
-                elements.csvFileInput = document.getElementById("csv-file-input");
-                elements.targetStation = document.getElementById("target-station");
-                elements.btnQuery = document.getElementById("btn-query");
-                elements.btnPlay = document.getElementById("btn-play");
-                elements.btnStop = document.getElementById("btn-stop");
-                elements.btnFavorite = document.getElementById("btn-favorite");
-                elements.btnQueue = document.getElementById("btn-queue");
-                elements.btnRetry = document.getElementById("btn-retry");
-                elements.btnToggleHud = document.getElementById("btn-toggle-hud");
-                elements.btnTheme = document.getElementById("btn-theme");
-                elements.btnRefreshMeta = document.getElementById("btn-refresh-meta");
-                elements.btnQueueNext = document.getElementById("btn-queue-next");
-                elements.masterVolume = document.getElementById("master-volume");
-                elements.volumeValue = document.getElementById("volume-value");
-                elements.targetStation = document.getElementById("target-station");
-                elements.nowPlayingTitle = document.getElementById("now-playing-title");
-                elements.nowPlayingSubtitle = document.getElementById("now-playing-subtitle");
-                elements.streamTitle = document.getElementById("stream-title");
-                elements.visualizerCanvas = document.getElementById("visualizer-canvas");
-                elements.hudCanvas = document.getElementById("hud-canvas");
-                elements.toast = document.getElementById("toast");
-                elements.hudOverlay = document.getElementById("hud-overlay");
-                elements.modalOverlay = document.getElementById("modal-overlay");
-                elements.modalBody = document.getElementById("modal-body");
-                elements.modalTitle = document.getElementById("modal-title");
-                elements.modalClose = document.getElementById("modal-close");
-                elements.brandStatus = document.getElementById("brand-status");
-                elements.stationHealthPill = document.getElementById("station-health-pill");
-                elements.metaStationName = document.getElementById("meta-station-name");
-                elements.metaCountry = document.getElementById("meta-country");
-                elements.metaGenre = document.getElementById("meta-genre");
-                elements.metaBitrate = document.getElementById("meta-bitrate");
-                elements.metaCodec = document.getElementById("meta-codec");
-                elements.metaStatus = document.getElementById("meta-status");
-                elements.metaSource = document.getElementById("meta-source");
-                elements.metaListeners = document.getElementById("meta-listeners");
-                elements.favoritesList = document.getElementById("favorites-list");
-                elements.queueList = document.getElementById("queue-list");
-                elements.historyList = document.getElementById("history-list");
-                elements.hudTitle = document.getElementById("hud-title");
-                elements.hudBuffer = document.getElementById("hud-buffer");
-                elements.hudLatency = document.getElementById("hud-latency");
-                elements.hudQuality = document.getElementById("hud-quality");
-                elements.diagBuffer = document.getElementById("diag-buffer");
-                elements.diagSNR = document.getElementById("diag-snr");
-                elements.diagLatency = document.getElementById("diag-latency");
-                elements.diagQuality = document.getElementById("diag-quality");
-                elements.insightPlaytime = document.getElementById("insight-playtime");
-                elements.insightStations = document.getElementById("insight-stations");
-                elements.insightFavorites = document.getElementById("insight-favorites");
-                elements.insightMode = document.getElementById("insight-mode");
-                elements.featureChips = Array.from(document.querySelectorAll(".feature-chip"));
-                elements.eqSliders = Array.from(document.querySelectorAll(".eq-slider"));
-                elements.presetChips = Array.from(document.querySelectorAll(".preset-chip"));
-                elements.modalLinks = Array.from(document.querySelectorAll("[data-open-modal]"));
-                elements.audio = document.createElement("audio");
-                elements.audio.crossOrigin = "anonymous";
-                elements.audio.preload = "auto";
-                elements.audio.autoplay = false;
-                elements.audio.controls = false;
-                document.body.appendChild(elements.audio);
-                state.audioEl = elements.audio;
+            const url = this.dataset.favUrl;
+            const name = this.dataset.favName;
+            state.currentStation = { name, url, stationuuid: name };
+            state.currentStreamUrl = url;
+            setCurrentTitle(name);
+            playCurrentStation();
+          });
+        });
+      }
+
+      function renderQueue() {
+        if (!state.queue.length) {
+          elements.queueList.innerHTML = "<li>Empty.</li>";
+          return;
+        }
+
+        elements.queueList.innerHTML = state.queue.map((item, idx) => {
+          const name = escapeHtml(item.name || `Queued ${idx + 1}`);
+          return `<li data-q-url="${escapeHtml(item.url)}" data-q-name="${escapeHtml(name)}">${name}<button class="list-item-remove" type="button">✕</button></li>`;
+        }).join("");
+
+        elements.queueList.querySelectorAll("li").forEach((li, idx) => {
+          li.addEventListener("click", function (e) {
+            if (e.target.classList.contains("list-item-remove")) {
+              state.queue.splice(idx, 1);
+              persistQueue();
+              renderQueue();
+              showToast("Removed from queue", 700);
+              return;
             }
 
-            function loadStoredState() {
-                try {
-                    const favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.favorites) || "[]");
-                    const queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.queue) || "[]");
-                    const history = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || "[]");
-                    const lastStation = JSON.parse(localStorage.getItem(STORAGE_KEYS.lastStation) || "null");
-                    const eq = JSON.parse(localStorage.getItem(STORAGE_KEYS.eq) || "null");
-                    const theme = localStorage.getItem(STORAGE_KEYS.theme) || "dark";
-                    const volume = Number(localStorage.getItem(STORAGE_KEYS.volume) || "80");
-                    state.favorites = Array.isArray(favorites) ? favorites : [];
-                    state.queue = Array.isArray(queue) ? queue : [];
-                    state.history = Array.isArray(history) ? history : [];
-                    state.lastStationUrl = lastStation && lastStation.url ? lastStation.url : "";
-                    state.currentTheme = theme === "dark" || theme === "light" ? theme : "dark";
-                    state.currentVolume = isNaN(volume) ? 80 : clamp(volume, 0, 100);
-                    if (eq && Array.isArray(eq) && eq.length === 5) {
-                        state.eqValues = eq.map(v => Number(v));
-                    } else {
-                        state.eqValues = defaultEQ.slice();
-                    }
-                } catch (err) {
-                    state.favorites = [];
-                    state.queue = [];
-                    state.history = [];
-                    state.eqValues = defaultEQ.slice();
-                    state.currentTheme = "dark";
-                    state.currentVolume = 80;
-                }
+            const url = this.dataset.qUrl;
+            const name = this.dataset.qName;
+            state.currentStation = { name, url, stationuuid: name };
+            state.currentStreamUrl = url;
+            setCurrentTitle(name);
+            playCurrentStation();
+          });
+        });
+      }
 
-                elements.masterVolume.value = String(state.currentVolume || 80);
-                elements.volumeValue.textContent = `${Math.round(state.currentVolume || 80)}%`;
+      function renderHistory() {
+        if (!state.history.length) {
+          elements.historyList.innerHTML = "<li>Nothing played.</li>";
+          return;
+        }
+
+        elements.historyList.innerHTML = state.history.slice(0, 10).map(item => {
+          const name = escapeHtml(item.name || "Station");
+          return `<li>${name}</li>`;
+        }).join("");
+      }
+
+      function renderSchedules() {
+        if (!state.schedules.length) {
+          elements.schedulerList.innerHTML = "<li>No schedules.</li>";
+          return;
+        }
+
+        elements.schedulerList.innerHTML = state.schedules.map((sched, idx) => {
+          const timeStr = sched.time || "00:00";
+          const actionStr = sched.action || "play";
+          const stationName = sched.stationName ? ` — ${escapeHtml(sched.stationName)}` : "";
+          return `<li>${timeStr} ${actionStr}${stationName}<button class="list-item-remove" type="button">✕</button></li>`;
+        }).join("");
+
+        elements.schedulerList.querySelectorAll("li").forEach((li, idx) => {
+          const btn = li.querySelector(".list-item-remove");
+          if (btn) {
+            btn.addEventListener("click", e => {
+              e.stopPropagation();
+              state.schedules.splice(idx, 1);
+              persistSchedules();
+              renderSchedules();
+              scheduleNextEvent();
+              showToast("Schedule removed", 700);
+            });
+          }
+        });
+      }
+
+      function addScheduleEvent() {
+        const time = elements.scheduleTime.value;
+        const action = elements.scheduleAction.value;
+
+        if (!time) {
+          showToast("Set a time", 1200);
+          return;
+        }
+
+        const stationName = state.currentStation ? state.currentStation.name : "";
+        state.schedules.push({ time, action, stationName, stationUrl: state.currentStreamUrl });
+
+        persistSchedules();
+        renderSchedules();
+        scheduleNextEvent();
+        showToast("Schedule added", 900);
+
+        elements.scheduleTime.value = "";
+      }
+
+      function checkSchedules() {
+        const now = new Date();
+        const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+        state.schedules.forEach(sched => {
+          if (sched.time === currentTime && !sched.executed) {
+            sched.executed = true;
+
+            if (sched.action === "play" && sched.stationUrl) {
+              state.currentStreamUrl = sched.stationUrl;
+              if (sched.stationName) setCurrentTitle(sched.stationName);
+              playCurrentStation();
+              showToast(`Auto-playing: ${sched.stationName}`, 1800);
+            } else if (sched.action === "stop") {
+              stopPlayback();
+              showToast("Auto-stopped", 1200);
+            } else if (sched.action === "preset") {
+              const presetName = sched.stationName || state.currentPreset;
+              applyEqPreset(presetName);
+              showToast(`Preset: ${presetName}`, 1200);
             }
 
-            function bindEvents() {
-                elements.registryBase.addEventListener("change", function () {
-                    state.selectedSource = this.value;
-                    toggleSourceControls();
-                });
+            scheduleNextEvent();
+          }
+        });
+      }
 
-                elements.btnQuery.addEventListener("click", handleSearch);
-                elements.btnPlay.addEventListener("click", playCurrentStation);
-                elements.btnStop.addEventListener("click", stopPlayback);
-                elements.btnFavorite.addEventListener("click", toggleFavoriteCurrentStation);
-                elements.btnQueue.addEventListener("click", queueCurrentStation);
-                elements.btnRetry.addEventListener("click", retryCurrentStream);
-                elements.btnToggleHud.addEventListener("click", toggleHud);
-                elements.btnTheme.addEventListener("click", toggleTheme);
-                elements.btnRefreshMeta.addEventListener("click", refreshMetadataNow);
-                elements.btnQueueNext.addEventListener("click", playNextInQueue);
+      function scheduleNextEvent() {
+        const now = new Date();
+        const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
-                elements.targetStation.addEventListener("change", function () {
-                    if (!this.value) {
-                        return;
-                    }
-
-                    const found = state.stations.find(station => String(station.stationuuid || station.name) === String(this.value));
-                    if (!found) {
-                        return;
-                    }
-
-                    selectStation(found);
-                });
-
-                elements.masterVolume.addEventListener("input", function () {
-                    const value = Number(this.value);
-                    state.currentVolume = clamp(value, 0, 100);
-                    elements.volumeValue.textContent = `${Math.round(state.currentVolume)}%`;
-                    localStorage.setItem(STORAGE_KEYS.volume, String(state.currentVolume));
-                    if (state.audioEl) {
-                        state.audioEl.volume = state.currentVolume / 100;
-                    }
-                    if (state.gainNode) {
-                        state.gainNode.gain.value = state.currentVolume / 100;
-                    }
-                });
-
-                elements.eqSliders.forEach((slider) => {
-                    slider.addEventListener("input", function () {
-                        const index = Number(this.dataset.index);
-                        state.eqValues[index] = Number(this.value);
-                        applyEqPreset(null);
-                        saveEqToStorage();
-                    });
-                });
-
-                elements.presetChips.forEach((chip) => {
-                    chip.addEventListener("click", function () {
-                        const preset = this.dataset.preset;
-                        applyEqPreset(preset);
-                    });
-                });
-
-                elements.featureChips.forEach((chip) => {
-                    chip.addEventListener("click", function () {
-                        state.visualizerMode = this.dataset.visualizer;
-                        elements.featureChips.forEach(item => item.classList.toggle("active", item === this));
-                    });
-                });
-
-                elements.modalClose.addEventListener("click", closeModal);
-                elements.modalOverlay.addEventListener("click", function (event) {
-                    if (event.target === elements.modalOverlay) {
-                        closeModal();
-                    }
-                });
-
-                elements.modalLinks.forEach((link) => {
-                    link.addEventListener("click", function (event) {
-                        event.preventDefault();
-                        openModal(this.dataset.openModal);
-                    });
-                });
-
-                elements.customUrlInput.addEventListener("keydown", function (event) {
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        handleCustomUrl();
-                    }
-                });
-
-                document.addEventListener("keydown", function (event) {
-                    if (event.target && ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) {
-                        return;
-                    }
-
-                    const key = event.key.toLowerCase();
-                    if (key === " " && !event.repeat) {
-                        event.preventDefault();
-                        if (state.playing) {
-                            pauseAudio();
-                        } else {
-                            playCurrentStation();
-                        }
-                    } else if (key === "s") {
-                        stopPlayback();
-                    } else if (key === "f") {
-                        toggleFavoriteCurrentStation();
-                    } else if (key === "q") {
-                        queueCurrentStation();
-                    } else if (key === "m") {
-                        toggleHud();
-                    } else if (key === "t") {
-                        toggleTheme();
-                    } else if (key === "n") {
-                        playNextInQueue();
-                    } else if (key === "r") {
-                        retryCurrentStream();
-                    } else if (key === "arrowup") {
-                        event.preventDefault();
-                        adjustVolume(5);
-                    } else if (key === "arrowdown") {
-                        event.preventDefault();
-                        adjustVolume(-5);
-                    }
-                });
-
-                window.addEventListener("beforeunload", () => {
-                    if (state.audioEl) {
-                        state.audioEl.pause();
-                        state.audioEl.src = "";
-                    }
-                });
-
-                document.getElementById("csv-file-input").addEventListener("change", function (event) {
-                    const file = event.target.files && event.target.files[0];
-                    if (!file) return;
-                    loadCsvOrPlaylist(file);
-                });
+        let next = null;
+        state.schedules.forEach(sched => {
+          if (sched.time > currentTime) {
+            if (!next || sched.time < next.time) {
+              next = sched;
             }
-
-            function toggleSourceControls() {
-                const source = state.selectedSource;
-                const queryInput = elements.searchQuery;
-                const customInput = elements.customUrlInput;
-                const csvInput = elements.csvFileInput;
-
-                queryInput.classList.toggle("hidden", source === "custom-url" || source === "csv" || source === "playlist");
-                customInput.classList.toggle("hidden", source !== "custom-url");
-                csvInput.classList.toggle("hidden", source !== "csv" && source !== "playlist");
-
-                if (source === "custom-url") {
-                    elements.searchQuery.value = "";
-                    elements.searchQuery.placeholder = "Optional label";
-                } else if (source === "csv" || source === "playlist") {
-                    elements.searchQuery.value = "";
-                    elements.searchQuery.placeholder = "Optional filter or station group";
-                } else {
-                    elements.searchQuery.placeholder = "Search by genre, city, or station name";
-                }
-            }
-
-            function handleSearch() {
-                const source = state.selectedSource;
-                if (source === "custom-url") {
-                    handleCustomUrl();
-                    return;
-                }
-
-                if (source === "csv" || source === "playlist") {
-                    if (elements.csvFileInput.files && elements.csvFileInput.files.length > 0) {
-                        loadCsvOrPlaylist(elements.csvFileInput.files[0]);
-                    } else {
-                        showToast("No file selected", 1500);
-                        elements.csvFileInput.click();
-                    }
-                    return;
-                }
-
-                const query = (elements.searchQuery.value || "").trim();
-                if (!query) {
-                    fetchStationsByDefault();
-                    return;
-                }
-
-                fetchRadioBrowserStations(query);
-            }
-
-            function handleCustomUrl() {
-                const url = (elements.customUrlInput.value || "").trim();
-                if (!url) {
-                    showToast("Paste a stream URL first", 1600);
-                    return;
-                }
-
-                const custom = {
-                    name: "Custom Stream",
-                    url,
-                    urlResolved: url,
-                    codec: detectCodecFromUrl(url),
-                    country: "Custom",
-                    state: "Custom",
-                    language: "Custom",
-                    tags: "custom stream",
-                    bitrates: "Unknown",
-                    stationuuid: `custom-${Date.now()}`
-                };
-
-                state.stations = [custom];
-                renderTargetStations();
-                selectStation(custom);
-                setCurrentTitle(custom.name);
-                showToast("Custom station loaded", 1600);
-            }
-
-            function fetchStationsByDefault() {
-                const url = `${radioBrowserBase}?limit=25&hidebroken=false&order=votes&reverse=true&countrycode=&language=&tag=&codec=&offset=0`;
-                fetchJson(url).then((data) => {
-                    state.stations = Array.isArray(data) ? data : [];
-                    renderTargetStations();
-                    if (state.stations.length) {
-                        selectStation(state.stations[0]);
-                    }
-                }).catch(() => {
-                    showToast("Radio Browser request failed", 1800);
-                });
-            }
-
-            function fetchRadioBrowserStations(query) {
-                const encoded = encodeURIComponent(query);
-                const url = `${radioBrowserBase}?name=${encoded}&limit=25&hidebroken=false&country=&language=&tag=&codec=&order=votes&reverse=true`;
-                fetchJson(url).then((data) => {
-                    state.stations = Array.isArray(data) ? data : [];
-                    renderTargetStations();
-                    if (state.stations.length) {
-                        const first = state.stations[0];
-                        selectStation(first);
-                        showToast(`Loaded ${state.stations.length} stations`, 1500);
-                    } else {
-                        showToast("No stations matched search", 1800);
-                    }
-                }).catch(() => {
-                    showToast("Search failed; try a broader query", 1800);
-                });
-            }
-
-            function renderTargetStations() {
-                const options = ['<option value="">Select a station</option>'];
-                state.stations.forEach((station) => {
-                    const name = escapeHtml(station.name || station.stationname || "Unnamed Station");
-                    const value = station.stationuuid || station.name || name;
-                    options.push(`<option value="${escapeHtml(String(value))}">${name}</option>`);
-                });
-                elements.targetStation.innerHTML = options.join("");
-            }
-
-            function selectStation(station) {
-                if (!station) return;
-                state.currentStation = station;
-                const stationUrl = station.url || station.urlResolved || "";
-                state.currentStreamUrl = stationUrl;
-                state.lastStationUrl = stationUrl;
-
-                const meta = {
-                    stationName: station.name || station.stationname || "Custom Station",
-                    country: station.country || station.countrycode || "Unknown",
-                    genre: station.tags || station.genre || "Various",
-                    bitrate: station.bitrate || "Unknown",
-                    codec: station.codec || detectCodecFromUrl(stationUrl) || "Unknown",
-                    source: station.url || "Direct URL",
-                    listeners: station.listeners || "Unknown"
-                };
-
-                elements.metaStationName.textContent = meta.stationName;
-                elements.metaCountry.textContent = meta.country;
-                elements.metaGenre.textContent = meta.genre;
-                elements.metaBitrate.textContent = meta.bitrate;
-                elements.metaCodec.textContent = meta.codec;
-                elements.metaSource.textContent = meta.source;
-                elements.metaListeners.textContent = meta.listeners;
-                elements.streamTitle.textContent = station.name || station.stationname || "Custom Stream";
-                elements.hudTitle.textContent = meta.stationName;
-                setCurrentTitle(meta.stationName);
-                setSubtitle(`${meta.country} • ${meta.genre}`);
-                localStorage.setItem(STORAGE_KEYS.lastStation, JSON.stringify({ url: stationUrl, name: meta.stationName }));
-                updateMetadataCard();
-                ensureStationInHistory(station);
-                updateInsightStats();
-            }
-
-            function setCurrentTitle(title) {
-                elements.nowPlayingTitle.textContent = title || "Waiting for a signal";
-                elements.hudTitle.textContent = title || "No stream loaded";
-            }
-
-            function setSubtitle(value) {
-                elements.nowPlayingSubtitle.textContent = value || "Ready for discovery, playback, and metadata streaming.";
-            }
-
-            function installAudio() {
-                state.audioEl.volume = (state.currentVolume || 80) / 100;
-                state.audioEl.preload = "auto";
-
-                state.audioEl.addEventListener("loadstart", () => {
-                    updateBrandStatus("Connecting");
-                });
-
-                state.audioEl.addEventListener("canplay", () => {
-                    state.isAudioReady = true;
-                    updateBrandStatus("Ready");
-                    showToast("Signal ready", 1000);
-                });
-
-                state.audioEl.addEventListener("playing", () => {
-                    state.playing = true;
-                    updateBrandStatus("Live");
-                    updateInsightStats();
-                });
-
-                state.audioEl.addEventListener("pause", () => {
-                    state.playing = false;
-                    updateBrandStatus("Paused");
-                    updateInsightStats();
-                });
-
-                state.audioEl.addEventListener("ended", () => {
-                    state.playing = false;
-                    updateBrandStatus("Stream ended");
-                    showToast("Stream ended", 1800);
-                });
-
-                state.audioEl.addEventListener("error", () => {
-                    state.playing = false;
-                    updateBrandStatus("Playback error");
-                    showToast("Playback error — retrying or switching source", 2200);
-                    updateStationHealth("Connection unstable");
-                });
-
-                state.audioEl.addEventListener("timeupdate", () => {
-                    if (state.audioEl && isFinite(state.audioEl.currentTime)) {
-                        updatePlaytime();
-                    }
-                });
-
-                state.audioEl.addEventListener("loadedmetadata", () => {
-                    // No-op; kept explicit for metadata readiness
-                });
-
-                state.audioEl.addEventListener("seeking", () => {
-                    updateBrandStatus("Seeking");
-                });
-
-                state.audioEl.addEventListener("stalled", () => {
-                    updateBrandStatus("Buffering");
-                    updateStationHealth("Buffering");
-                });
-
-                state.audioEl.addEventListener("waiting", () => {
-                    updateBrandStatus("Buffering");
-                    updateStationHealth("Buffering");
-                });
-
-                connectAudioGraph();
-            }
-
-            function connectAudioGraph() {
-                try {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioCtx) {
-                        return;
-                    }
-
-                    if (!state.audioContext) {
-                        state.audioContext = new AudioCtx();
-                    }
-
-                    if (state.audioContext.state === "suspended") {
-                        state.audioContext.resume();
-                    }
-
-                    if (!state.gainNode) {
-                        state.gainNode = state.audioContext.createGain();
-                        state.gainNode.gain.value = (state.currentVolume || 80) / 100;
-                    }
-
-                    if (!state.mediaSource && state.audioEl) {
-                        state.mediaSource = state.audioContext.createMediaElementSource(state.audioEl);
-                    }
-
-                    const nodes = [];
-                    let current = state.mediaSource;
-
-                    for (let i = 0; i < 5; i += 1) {
-                        const filter = state.audioContext.createBiquadFilter();
-                        filter.type = "peaking";
-                        filter.frequency.value = [60, 230, 910, 3600, 14000][i];
-                        filter.Q.value = 1;
-                        filter.gain.value = state.eqValues[i] || 0;
-                        nodes.push(filter);
-                    }
-
-                    if (nodes.length) {
-                        state.eqNodes = nodes;
-                        current.connect(nodes[0]);
-                        for (let i = 0; i < nodes.length - 1; i += 1) {
-                            nodes[i].connect(nodes[i + 1]);
-                        }
-                        nodes[nodes.length - 1].connect(state.gainNode);
-                    } else {
-                        state.mediaSource.connect(state.gainNode);
-                    }
-
-                    state.gainNode.connect(state.audioContext.destination);
-                } catch (err) {
-                    console.warn("Audio graph connection failed:", err);
-                }
-            }
-
-            function applyEqPreset(name) {
-                const presetName = name || state.currentPreset || "flat";
-                let values = presetMap[presetName] || presetMap.flat;
-
-                if (!name && state.eqValues && state.eqValues.length === 5) {
-                    values = state.eqValues.slice();
-                }
-
-                state.currentPreset = presetName;
-
-                elements.presetChips.forEach((chip) => {
-                    const isActive = chip.dataset.preset === presetName;
-                    chip.classList.toggle("active", isActive);
-                });
-
-                if (state.eqNodes.length) {
-                    state.eqNodes.forEach((node, idx) => {
-                        node.gain.value = values[idx];
-                    });
-                }
-
-                elements.eqSliders.forEach((slider, idx) => {
-                    slider.value = values[idx];
-                });
-
-                state.eqValues = values.slice();
-                saveEqToStorage();
-            }
-
-            function saveEqToStorage() {
-                try {
-                    localStorage.setItem(STORAGE_KEYS.eq, JSON.stringify(state.eqValues));
-                } catch (err) {
-                    // storage may fail in private mode; ignore
-                }
-            }
-
-            function playCurrentStation() {
-                if (!state.currentStreamUrl) {
-                    const selected = elements.targetStation.value;
-                    const station = state.stations.find(item => {
-                        const value = item.stationuuid || item.name || "";
-                        return String(value) === String(selected);
-                    });
-                    if (station) {
-                        selectStation(station);
-                    } else {
-                        showToast("Choose a station first", 1600);
-                        return;
-                    }
-                }
-
-                const streamUrl = normalizeStreamUrl(state.currentStreamUrl);
-                if (!streamUrl) {
-                    showToast("No valid stream URL", 1800);
-                    return;
-                }
-
-                if (!state.audioEl) {
-                    installAudio();
-                }
-
-                if (state.audioContext && state.audioContext.state === "suspended") {
-                    state.audioContext.resume();
-                }
-
-                if (state.audioEl.src !== streamUrl) {
-                    state.audioEl.src = streamUrl;
-                }
-
-                state.audioEl.volume = (state.currentVolume || 80) / 100;
-                state.audioEl.play().then(() => {
-                    state.playing = true;
-                    updateBrandStatus("Live");
-                    setCurrentTitle(state.currentStation && state.currentStation.name ? state.currentStation.name : "Playing");
-                    updateInsightStats();
-                    ensureStationInHistory(state.currentStation || { name: "Custom Stream", url: streamUrl });
-
-                    if (state.audioEl) {
-                        state.audioEl.setAttribute("playsinline", "true");
-                    }
-                    showToast("Playback started", 1200);
-                }).catch(() => {
-                    showToast("Autoplay blocked by browser; click again", 2200);
-                    state.playing = false;
-                    updateBrandStatus("Blocked");
-                });
-            }
-
-            function pauseAudio() {
-                if (!state.audioEl) return;
-                state.audioEl.pause();
-                state.playing = false;
-                updateBrandStatus("Paused");
-            }
-
-            function stopPlayback() {
-                if (!state.audioEl) return;
-                state.audioEl.pause();
-                state.audioEl.currentTime = 0;
-                state.playing = false;
-                updateBrandStatus("Stopped");
-                showToast("Signal severed", 1300);
-            }
-
-            function retryCurrentStream() {
-                if (!state.currentStreamUrl) {
-                    showToast("No active stream to retry", 1600);
-                    return;
-                }
-
-                if (state.audioEl) {
-                    state.audioEl.src = "";
-                    state.audioEl.load();
-                    state.audioEl.src = normalizeStreamUrl(state.currentStreamUrl);
-                    state.audioEl.play().catch(() => {
-                        showToast("Retry blocked; user interaction required", 1800);
-                    });
-                    updateBrandStatus("Retrying");
-                }
-            }
-
-            function toggleFavoriteCurrentStation() {
-                if (!state.currentStation) {
-                    showToast("Choose a station first", 1500);
-                    return;
-                }
-
-                const id = state.currentStation.stationuuid || state.currentStation.name || state.currentStreamUrl;
-                const exists = state.favorites.some(item => {
-                    const itemKey = item.stationuuid || item.name || item.url || "";
-                    return itemKey === id;
-                });
-
-                if (exists) {
-                    state.favorites = state.favorites.filter(item => {
-                        const itemKey = item.stationuuid || item.name || item.url || "";
-                        return itemKey !== id;
-                    });
-                    showToast("Removed from favorites", 1300);
-                } else {
-                    state.favorites.push({
-                        name: state.currentStation.name || "Custom Stream",
-                        url: state.currentStreamUrl || "",
-                        stationuuid: state.currentStation.stationuuid || String(Date.now()),
-                        country: state.currentStation.country || "Unknown",
-                        tags: state.currentStation.tags || state.currentStation.genre || "radio"
-                    });
-                    showToast("Added to favorites", 1300);
-                }
-
-                persistFavorites();
-                renderFavorites();
-                updateInsightStats();
-            }
-
-            function queueCurrentStation() {
-                if (!state.currentStation) {
-                    showToast("Choose a station first", 1500);
-                    return;
-                }
-
-                const queueItem = {
-                    name: state.currentStation.name || "Custom Stream",
-                    url: state.currentStreamUrl || "",
-                    stationuuid: state.currentStation.stationuuid || String(Date.now())
-                };
-
-                state.queue.push(queueItem);
-                persistQueue();
-                renderQueue();
-                showToast("Queued", 1200);
-            }
-
-            function playNextInQueue() {
-                if (!state.queue.length) {
-                    showToast("No queued stations", 1500);
-                    return;
-                }
-
-                const next = state.queue.shift();
-                state.currentStation = next;
-                state.currentStreamUrl = next.url || "";
-                state.currentStation = {
-                    ...state.currentStation,
-                    name: next.name,
-                    url: next.url,
-                    stationuuid: next.stationuuid
-                };
-                persistQueue();
-                renderQueue();
-                playCurrentStation();
-            }
-
-            function renderFavorites() {
-                if (!state.favorites.length) {
-                    elements.favoritesList.innerHTML = "<li>No favorites yet.</li>";
-                    return;
-                }
-
-                elements.favoritesList.innerHTML = state.favorites.map((item, idx) => {
-                    const name = escapeHtml(item.name || `Favorite ${idx + 1}`);
-                    return `<li data-fav-url="${escapeHtml(item.url || "")}" data-fav-name="${escapeHtml(name)}">${name}</li>`;
-                }).join("");
-
-                elements.favoritesList.querySelectorAll("li").forEach((li) => {
-                    li.addEventListener("click", function () {
-                        const url = this.dataset.favUrl;
-                        const name = this.dataset.favName;
-                        if (!url) return;
-
-                        state.currentStation = { name, url, stationuuid: name };
-                        state.currentStreamUrl = url;
-                        setCurrentTitle(name);
-                        setSubtitle("Favorite station loaded");
-                        playCurrentStation();
-                    });
-                });
-            }
-
-            function renderQueue() {
-                if (!state.queue.length) {
-                    elements.queueList.innerHTML = "<li>Queue empty.</li>";
-                    return;
-                }
-
-                elements.queueList.innerHTML = state.queue.map((item, idx) => {
-                    const name = escapeHtml(item.name || `Queued ${idx + 1}`);
-                    return `<li data-queue-url="${escapeHtml(item.url || "")}" data-queue-name="${escapeHtml(name)}">${name}</li>`;
-                }).join("");
-
-                elements.queueList.querySelectorAll("li").forEach((li) => {
-                    li.addEventListener("click", function () {
-                        const url = this.dataset.queueUrl;
-                        const name = this.dataset.queueName;
-                        state.currentStation = { name, url, stationuuid: name };
-                        state.currentStreamUrl = url;
-                        setCurrentTitle(name);
-                        setSubtitle("Queued station selected");
-                        playCurrentStation();
-                    });
-                });
-            }
-
-            function renderHistory() {
-                if (!state.history.length) {
-                    elements.historyList.innerHTML = "<li>Nothing played yet.</li>";
-                    return;
-                }
-
-                elements.historyList.innerHTML = state.history.slice(0, 8).map((item) => {
-                    const name = escapeHtml(item.name || "Station");
-                    return `<li>${name}</li>`;
-                }).join("");
-            }
-
-            function persistFavorites() {
-                try {
-                    localStorage.setItem(STORAGE_KEYS.favorites, JSON.stringify(state.favorites));
-                } catch (err) {
-                    // ignore
-                }
-            }
-
-            function persistQueue() {
-                try {
-                    localStorage.setItem(STORAGE_KEYS.queue, JSON.stringify(state.queue));
-                } catch (err) {
-                    // ignore
-                }
-            }
-
-            function persistHistory() {
-                try {
-                    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history));
-                } catch (err) {
-                    // ignore
-                }
-            }
-
-            function ensureStationInHistory(station) {
-                if (!station) return;
-
-                const name = station.name || station.stationname || "Custom Stream";
-                const url = station.url || station.urlResolved || state.currentStreamUrl || "";
-                const entry = { name, url };
-
-                state.history = state.history.filter(item => !(item.name === name && item.url === url));
-                state.history.unshift(entry);
-                if (state.history.length > 12) {
-                    state.history = state.history.slice(0, 12);
-                }
-
-                persistHistory();
-                renderHistory();
-                updateInsightStats();
-            }
-
-            function updateInsightStats() {
-                const stationCount = state.stations.length || 0;
-                const favoriteCount = state.favorites.length || 0;
-
-                elements.insightStations.textContent = String(stationCount);
-                elements.insightFavorites.textContent = String(favoriteCount);
-                elements.insightMode.textContent = state.playing ? "Live" : "Idle";
-                updatePlaytime();
-            }
-
-            function updatePlaytime() {
-                if (!state.audioEl || !isFinite(state.audioEl.currentTime)) {
-                    elements.insightPlaytime.textContent = formatSeconds(state.playSeconds || 0);
-                    elements.diagBuffer.textContent = `${Math.round(state.currentBuffer || 0)}%`;
-                    return;
-                }
-
-                const seconds = Math.max(0, Math.round(state.audioEl.currentTime));
-                elements.insightPlaytime.textContent = formatSeconds(seconds);
-            }
-
-            function formatSeconds(value) {
-                const total = Number(value) || 0;
-                const mins = Math.floor(total / 60);
-                const secs = total % 60;
-                return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-            }
-
-            function updateBrandStatus(value) {
-                elements.brandStatus.textContent = value || "Standby";
-            }
-
-            function updateStationHealth(value) {
-                state.stationHealth = value || "Network stable";
-                elements.stationHealthPill.textContent = value || "Network Stable";
-            }
-
-            function updateSignalDiagnostics() {
-                const base = state.playing ? 86 : 22;
-                const drift = Math.random() * 24;
-                state.currentBuffer = clamp(Math.round(base + drift - (state.playing ? 10 : 0)), 0, 100);
-                state.currentSNR = Math.round(28 + Math.random() * 30);
-                state.currentLatency = Math.round(40 + Math.random() * 120);
-                state.currentQuality = Math.round(70 + Math.random() * 30);
-
-                elements.diagBuffer.textContent = `${state.currentBuffer}%`;
-                elements.diagSNR.textContent = `${state.currentSNR}dB`;
-                elements.diagLatency.textContent = `${state.currentLatency}ms`;
-                elements.diagQuality.textContent = `${state.currentQuality}%`;
-
-                elements.hudBuffer.textContent = `${state.currentBuffer}%`;
-                elements.hudLatency.textContent = `${state.currentLatency}ms`;
-                elements.hudQuality.textContent = `${state.currentQuality}%`;
-            }
-
-            function toggleHud() {
-                const isHidden = elements.hudOverlay.classList.contains("hidden");
-                elements.hudOverlay.classList.toggle("hidden", !isHidden);
-                document.body.classList.toggle("hud-active", isHidden);
-                if (isHidden) {
-                    showToast("HUD enabled", 1000);
-                } else {
-                    showToast("HUD disabled", 1000);
-                }
-            }
-
-            function toggleTheme() {
-                state.currentTheme = state.currentTheme === "dark" ? "light" : "dark";
-                setTheme(state.currentTheme);
-                localStorage.setItem(STORAGE_KEYS.theme, state.currentTheme);
-            }
-
-            function setTheme(themeName) {
-                const root = document.documentElement;
-                const isLight = themeName === "light";
-                root.style.setProperty("--bg-0", isLight ? "#ebedf2" : "#05070b");
-                root.style.setProperty("--bg-1", isLight ? "#f5f6fa" : "#0d1117");
-                root.style.setProperty("--bg-2", isLight ? "#ffffff" : "#121922");
-                root.style.setProperty("--panel", isLight ? "rgba(20,25,35,0.04)" : "rgba(255,255,255,0.035)");
-                root.style.setProperty("--panel-strong", isLight ? "rgba(20,25,35,0.08)" : "rgba(255,255,255,0.07)");
-                root.style.setProperty("--panel-soft", isLight ? "rgba(20,25,35,0.02)" : "rgba(255,255,255,0.025)");
-                root.style.setProperty("--line", isLight ? "rgba(14,18,24,0.14)" : "rgba(255,255,255,0.12)");
-                root.style.setProperty("--line-strong", isLight ? "rgba(14,18,24,0.2)" : "rgba(255,255,255,0.2)");
-                root.style.setProperty("--text", isLight ? "#111827" : "#f7f3de");
-                root.style.setProperty("--muted", isLight ? "#4d586e" : "#b9bcc8");
-                root.style.setProperty("--muted-2", isLight ? "#687389" : "#8e93a7");
-                root.style.setProperty("--text-strong", isLight ? "#070b12" : "#ffffff");
-                root.style.setProperty("--accent", isLight ? "#6d5d00" : "#ffef86");
-                root.style.setProperty("--accent-2", isLight ? "#815a00" : "#ffe66d");
-                root.style.setProperty("--accent-3", isLight ? "#efe7b8" : "#fff9c4");
-                root.style.setProperty("--shadow", isLight ? "rgba(0,0,0,0.16)" : "rgba(0,0,0,0.45)");
-                root.style.setProperty("--success", isLight ? "#0b8f5b" : "#7cf2b1");
-                root.style.setProperty("--warning", isLight ? "#b97d00" : "#ffd166");
-                root.style.setProperty("--danger", isLight ? "#c23934" : "#ff6b6b");
-            }
-
-            function openModal(key) {
-                const content = modalMap[key];
-                if (!content) return;
-
-                elements.modalTitle.textContent = key === "about" ? "About TMW-RP" : key === "shortcuts" ? "Keyboard shortcuts" : "Troubleshooting";
-                elements.modalBody.innerHTML = "<ul>" + content.map(item => `<li>${escapeHtml(item)}</li>`).join("") + "</ul>";
-                elements.modalOverlay.classList.remove("hidden");
-                elements.modalOverlay.setAttribute("aria-hidden", "false");
-            }
-
-            function closeModal() {
-                elements.modalOverlay.classList.add("hidden");
-                elements.modalOverlay.setAttribute("aria-hidden", "true");
-            }
-
-            function showToast(message, duration = 1600) {
-                elements.toast.textContent = message;
-                elements.toast.classList.add("visible");
-                clearTimeout(showToast.timer);
-                showToast.timer = setTimeout(() => {
-                    elements.toast.classList.remove("visible");
-                }, duration);
-            }
-
-            function updateMetadataCard() {
-                if (!state.currentStation) {
-                    elements.metaStatus.textContent = "Idle";
-                    return;
-                }
-
-                const status = state.playing ? "Live" : "Ready";
-                elements.metaStatus.textContent = status;
-            }
-
-            function hydrateStationList() {
-                fetchJson(`${radioBrowserBase}?limit=12&hidebroken=false&order=votes&reverse=true`).then((data) => {
-                    state.stations = Array.isArray(data) ? data : [];
-                    renderTargetStations();
-                    const lastLocal = JSON.parse(localStorage.getItem(STORAGE_KEYS.lastStation) || "null");
-                    if (lastLocal && lastLocal.url) {
-                        const match = state.stations.find(station => (station.url || "").includes(lastLocal.url) || station.name === lastLocal.name);
-                        if (match) {
-                            selectStation(match);
-                        }
-                    }
-                }).catch(() => {
-                    // fallback to empty
-                });
-            }
-
-            function refreshSearchResults() {
-                const search = elements.searchQuery.value.trim();
-                if (search) {
-                    fetchRadioBrowserStations(search);
-                }
-            }
-
-            function fetchJson(url) {
-                return fetch(url, {
-                    method: "GET",
-                    cache: "no-store",
-                    headers: {
-                        "Accept": "application/json"
-                    }
-                }).then((response) => {
-                    if (!response.ok) {
-                        throw new Error("Network error");
-                    }
-                    return response.json();
-                });
-            }
-
-            function normalizeStreamUrl(raw) {
-                if (!raw) return "";
-                const value = String(raw).trim();
-                if (!value) return "";
-                return value.replace(/\\r/g, "").replace(/\\n/g, "");
-            }
-
-            function detectCodecFromUrl(url) {
-                const value = String(url || "").toLowerCase();
-                if (value.includes(".m3u8")) return "HLS";
-                if (value.includes(".aac")) return "AAC";
-                if (value.includes(".mp3")) return "MP3";
-                if (value.includes(".ogg")) return "OGG";
-                if (value.includes(".wav")) return "WAV";
-                return "Unknown";
-            }
-
-            function clamp(value, min, max) {
-                return Math.min(Math.max(value, min), max);
-            }
-
-            function escapeHtml(value) {
-                return String(value)
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-            }
-
-            function adjustVolume(delta) {
-                const next = clamp((Number(elements.masterVolume.value) || 80) + delta, 0, 100);
-                elements.masterVolume.value = String(next);
-                state.currentVolume = next;
-                elements.volumeValue.textContent = `${Math.round(next)}%`;
-                localStorage.setItem(STORAGE_KEYS.volume, String(next));
-                if (state.audioEl) {
-                    state.audioEl.volume = next / 100;
-                }
-                if (state.gainNode) {
-                    state.gainNode.gain.value = next / 100;
-                }
-            }
-
-            function loadCsvOrPlaylist(file) {
-                const name = file.name || "playlist";
-                const textPromise = file.text();
-                textPromise.then((text) => {
-                    const entries = parsePlaylistText(text);
-                    if (!entries.length) {
-                        showToast("No valid stream entries found", 1800);
-                        return;
-                    }
-
-                    state.stations = entries.map((entry, idx) => ({
-                        name: entry.name || `${name} #${idx + 1}`,
-                        url: entry.url,
-                        urlResolved: entry.url,
-                        codec: detectCodecFromUrl(entry.url),
-                        country: "Offline",
-                        state: "CSV",
-                        language: "Local",
-                        tags: entry.tags || "offline import",
-                        stationuuid: `offline-${Date.now()}-${idx}`
-                    }));
-
-                    renderTargetStations();
-                    selectStation(state.stations[0]);
-                    showToast(`Loaded ${entries.length} local entries`, 1800);
-                }).catch(() => {
-                    showToast("Could not read the file", 1800);
-                });
-            }
-
-            function parsePlaylistText(rawText) {
-                const lines = String(rawText).split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-                const entries = [];
-                let currentName = "Imported station";
-
-                for (let i = 0; i < lines.length; i += 1) {
-                    const line = lines[i];
-
-                    if (line.startsWith("#EXTINF")) {
-                        const matchName = line.match(/,(.*)$/);
-                        currentName = matchName ? matchName[1].trim() : `Imported Station ${entries.length + 1}`;
-                        continue;
-                    }
-
-                    if (/^https?:\/\//i.test(line) || /^data:/i.test(line) || /\.m3u8?$/i.test(line)) {
-                        entries.push({
-                            name: currentName || `Imported Station ${entries.length + 1}`,
-                            url: line,
-                            tags: "offline"
-                        });
-                    } else if (line.includes(",")) {
-                        const [name, url] = line.split(",");
-                        if (/^https?:\/\//i.test(url || "")) {
-                            entries.push({ name: name.trim() || `Imported Station ${entries.length + 1}`, url: url.trim() });
-                        }
-                    }
-                }
-
-                return entries;
-            }
-
-            function drawVisualizer() {
-                const canvas = elements.visualizerCanvas;
-                const ctx = canvas.getContext("2d");
-                const width = canvas.width;
-                const height = canvas.height;
-                ctx.clearRect(0, 0, width, height);
-
-                if (!state.playing) {
-                    drawIdleVisualizer(ctx, width, height);
-                    drawHudVisualizer(elements.hudCanvas.getContext("2d"), elements.hudCanvas.width, elements.hudCanvas.height);
-                    requestAnimationFrame(drawVisualizer);
-                    return;
-                }
-
-                const buffer = 40;
-                const data = new Uint8Array(buffer);
-
-                for (let i = 0; i < buffer; i += 1) {
-                    data[i] = Math.max(12, Math.min(156, Math.random() * 200));
-                }
-
-                if (state.visualizerMode === "spectrum") {
-                    drawSpectrum(ctx, width, height, data);
-                } else if (state.visualizerMode === "wave") {
-                    drawWaveform(ctx, width, height, data);
-                } else if (state.visualizerMode === "radial") {
-                    drawRadial(ctx, width, height, data);
-                }
-
-                drawHudVisualizer(elements.hudCanvas.getContext("2d"), elements.hudCanvas.width, elements.hudCanvas.height);
-                requestAnimationFrame(drawVisualizer);
-            }
-
-            function drawIdleVisualizer(ctx, width, height) {
-                ctx.fillStyle = "rgba(255,255,255,0.02)";
-                ctx.fillRect(0, 0, width, height);
-
-                const gradient = ctx.createLinearGradient(0, 0, width, 0);
-                gradient.addColorStop(0, "rgba(255,239,134,0.1)");
-                gradient.addColorStop(1, "rgba(255,239,134,0.02)");
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, width, height);
-
-                ctx.strokeStyle = "rgba(255,239,134,0.2)";
-                ctx.lineWidth = 1;
-
-                for (let i = 0; i < 18; i += 1) {
-                    const x = (i / 18) * width;
-                    ctx.beginPath();
-                    ctx.moveTo(x, height * 0.2);
-                    ctx.lineTo(x, height * 0.8);
-                    ctx.stroke();
-                }
-            }
-
-            function drawSpectrum(ctx, width, height, data) {
-                ctx.fillStyle = "rgba(255,255,255,0.02)";
-                ctx.fillRect(0, 0, width, height);
-
-                const barWidth = width / data.length;
-                for (let i = 0; i < data.length; i += 1) {
-                    const value = data[i];
-                    const barHeight = (value / 255) * (height * 0.8);
-                    const x = i * barWidth + 1;
-                    const y = height - barHeight;
-
-                    const grad = ctx.createLinearGradient(0, y, 0, height);
-                    grad.addColorStop(0, "rgba(255,239,134,0.95)");
-                    grad.addColorStop(1, "rgba(255,239,134,0.18)");
-                    ctx.fillStyle = grad;
-                    ctx.fillRect(x, y, barWidth - 2, barHeight);
-                }
-            }
-
-            function drawWaveform(ctx, width, height, data) {
-                ctx.fillStyle = "rgba(255,255,255,0.02)";
-                ctx.fillRect(0, 0, width, height);
-
-                ctx.beginPath();
-                ctx.moveTo(0, height / 2);
-
-                for (let i = 0; i < data.length; i += 1) {
-                    const x = (i / (data.length - 1)) * width;
-                    const v = ((data[i] / 255) - 0.5) * height * 0.9;
-                    const y = height / 2 + v;
-                    ctx.lineTo(x, y);
-                }
-
-                ctx.strokeStyle = "rgba(255,239,134,0.9)";
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-
-            function drawRadial(ctx, width, height, data) {
-                ctx.fillStyle = "rgba(255,255,255,0.02)";
-                ctx.fillRect(0, 0, width, height);
-
-                const cx = width / 2;
-                const cy = height / 2;
-                const baseRadius = Math.min(width, height) * 0.18;
-
-                for (let i = 0; i < data.length; i += 1) {
-                    const angle = (i / data.length) * Math.PI * 2;
-                    const len = baseRadius + (data[i] / 255) * 120;
-                    const x1 = cx + Math.cos(angle) * (baseRadius * 0.5);
-                    const y1 = cy + Math.sin(angle) * (baseRadius * 0.5);
-                    const x2 = cx + Math.cos(angle) * len;
-                    const y2 = cy + Math.sin(angle) * len;
-
-                    ctx.strokeStyle = `rgba(255,239,134,${0.2 + (i / data.length) * 0.8})`;
-                    ctx.lineWidth = 1.2;
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.stroke();
-                }
-
-                ctx.beginPath();
-                ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
-                ctx.strokeStyle = "rgba(255,239,134,0.5)";
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-
-            function drawHudVisualizer(ctx, width, height) {
-                ctx.clearRect(0, 0, width, height);
-                ctx.fillStyle = "rgba(255,255,255,0.02)";
-                ctx.fillRect(0, 0, width, height);
-
-                const bars = 30;
-                for (let i = 0; i < bars; i += 1) {
-                    const h = 8 + Math.random() * 44;
-                    const x = i * 11 + 2;
-                    const y = height - h - 2;
-                    ctx.fillStyle = "rgba(255,239,134,0.65)";
-                    ctx.fillRect(x, y, 7, h);
-                }
-            }
-
-            (function loopVisualizer() {
-                requestAnimationFrame(loopVisualizer);
-                const canvas = elements.visualizerCanvas;
-                if (!canvas) return;
-
-                const ctx = canvas.getContext("2d");
-                drawVisualizer();
-            })();
-
-            function hydrateOnLoad() {
-                const query = elements.searchQuery.value.trim();
-                if (query) {
-                    fetchRadioBrowserStations(query);
-                } else {
-                    fetchStationsByDefault();
-                }
-            }
-
-            init();
-            hydrateOnLoad();
-        })();
-    </script>
+          }
+        });
+
+        if (next) {
+          elements.nextScheduleInfo.textContent = `Next: ${next.time} (${next.action})`;
+          elements.nextScheduleInfo.classList.add("active-schedule");
+        } else {
+          elements.nextScheduleInfo.textContent = "No scheduled events";
+          elements.nextScheduleInfo.classList.remove("active-schedule");
+        }
+      }
+
+      function persistFavorites() {
+        try { localStorage.setItem(STORAGE_KEYS.favorites, JSON.stringify(state.favorites)); } catch (err) {}
+      }
+
+      function persistQueue() {
+        try { localStorage.setItem(STORAGE_KEYS.queue, JSON.stringify(state.queue)); } catch (err) {}
+      }
+
+      function persistHistory() {
+        try { localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(state.history)); } catch (err) {}
+      }
+
+      function persistSchedules() {
+        try { localStorage.setItem(STORAGE_KEYS.schedules, JSON.stringify(state.schedules)); } catch (err) {}
+      }
+
+      function ensureStationInHistory(station) {
+        if (!station) return;
+
+        const name = station.name || "Custom Stream";
+        const url = station.url || state.currentStreamUrl || "";
+        const entry = { name, url, timestamp: Date.now() };
+
+        state.history = state.history.filter(item => !(item.name === name && item.url === url));
+        state.history.unshift(entry);
+        if (state.history.length > 15) {
+          state.history = state.history.slice(0, 15);
+        }
+
+        persistHistory();
+        renderHistory();
+        updateInsightStats();
+      }
+
+      function updateInsightStats() {
+        const stationCount = state.stations.length || 0;
+        const favoriteCount = state.favorites.length || 0;
+
+        elements.insightStations.textContent = String(stationCount);
+        elements.insightFavorites.textContent = String(favoriteCount);
+        updatePlaytime();
+      }
+
+      function updatePlaytime() {
+        if (!state.audioEl || !isFinite(state.audioEl.currentTime)) {
+          elements.insightPlaytime.textContent = formatSeconds(state.playSeconds || 0);
+          return;
+        }
+
+        const seconds = Math.max(0, Math.round(state.audioEl.currentTime));
+        elements.insightPlaytime.textContent = formatSeconds(seconds);
+      }
+
+      function formatSeconds(value) {
+        const total = Number(value) || 0;
+        const mins = Math.floor(total / 60);
+        const secs = total % 60;
+        return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      }
+
+      function updateBrandStatus(value) {
+        elements.brandStatus.textContent = value || "Standby";
+      }
+
+      function updateMetadataCard() {
+        if (!state.currentStation) {
+          elements.metaStatus.textContent = "Idle";
+          return;
+        }
+
+        const status = state.playing ? "🔴 Live" : "Ready";
+        elements.metaStatus.textContent = status;
+      }
+
+      function updateSignalDiagnostics() {
+        const base = state.playing ? 86 : 22;
+        const drift = Math.random() * 24;
+        state.currentBuffer = clamp(Math.round(base + drift - (state.playing ? 10 : 0)), 0, 100);
+        state.currentSNR = Math.round(24 + Math.random() * 36);
+        state.currentLatency = Math.round(35 + Math.random() * 140);
+        state.currentQuality = Math.round(72 + Math.random() * 28);
+
+        elements.diagBuffer.textContent = `${state.currentBuffer}%`;
+        elements.diagSNR.textContent = `${state.currentSNR}dB`;
+        elements.diagLatency.textContent = `${state.currentLatency}ms`;
+        elements.diagQuality.textContent = `${state.currentQuality}%`;
+
+        elements.hudBuffer.textContent = `${state.currentBuffer}%`;
+        elements.hudLatency.textContent = `${state.currentLatency}ms`;
+        elements.hudQuality.textContent = `${state.currentQuality}%`;
+      }
+
+      function startSessionTimers() {
+        setInterval(() => {
+          if (state.playing) {
+            state.playSeconds += 1;
+          }
+          state.sessionUptime = Math.floor((Date.now() - state.sessionStartTime) / 1000);
+          elements.insightUptime.textContent = formatSeconds(state.sessionUptime);
+        }, 1000);
+      }
+
+      function updateTimeDisplay() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString("en-US", { hour12: false });
+        elements.timeDisplay.textContent = timeStr;
+      }
+
+      function toggleHud() {
+        const isHidden = elements.hudOverlay.classList.contains("hidden");
+        elements.hudOverlay.classList.toggle("hidden", !isHidden);
+        document.body.classList.toggle("hud-active", isHidden);
+        showToast(isHidden ? "HUD enabled" : "HUD disabled", 800);
+      }
+
+      function toggleTheme() {
+        state.currentTheme = state.currentTheme === "dark" ? "light" : "dark";
+        setTheme(state.currentTheme);
+        localStorage.setItem(STORAGE_KEYS.theme, state.currentTheme);
+      }
+
+      function setTheme(themeName) {
+        const root = document.documentElement;
+        const isLight = themeName === "light";
+        root.style.setProperty("--bg-0", isLight ? "#f0f1f4" : "#05070b");
+        root.style.setProperty("--bg-1", isLight ? "#f9fafb" : "#0d1117");
+        root.style.setProperty("--bg-2", isLight ? "#ffffff" : "#121922");
+        root.style.setProperty("--text", isLight ? "#0d1117" : "#f7f3de");
+        root.style.setProperty("--muted", isLight ? "#5a6272" : "#b9bcc8");
+      }
+
+      function openModal(key) {
+        const content = modalMap[key];
+        if (!content) return;
+
+        const titles = { about: "About TMW-RP", shortcuts: "Keyboard Help", troubleshooting: "Troubleshooting", stats: "Session Stats" };
+        elements.modalTitle.textContent = titles[key] || "Info";
+        elements.modalBody.innerHTML = "<ul>" + content.map(item => `<li>${escapeHtml(item)}</li>`).join("") + "</ul>";
+        elements.modalOverlay.classList.remove("hidden");
+      }
+
+      function closeModal() {
+        elements.modalOverlay.classList.add("hidden");
+      }
+
+      function showToast(message, duration = 1400) {
+        elements.toast.textContent = message;
+        elements.toast.classList.add("visible");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => {
+          elements.toast.classList.remove("visible");
+        }, duration);
+      }
+
+      function refreshMetadataNow() {
+        if (state.currentStation) {
+          selectStation(state.currentStation);
+          showToast("Metadata refreshed", 900);
+        }
+      }
+
+      function copyStreamUrl() {
+        if (!state.currentStreamUrl) {
+          showToast("No stream URL", 1200);
+          return;
+        }
+
+        navigator.clipboard.writeText(state.currentStreamUrl)
+          .then(() => showToast("URL copied", 800))
+          .catch(() => showToast("Copy failed", 1200));
+      }
+
+      function exportData() {
+        const data = {
+          favorites: state.favorites,
+          queue: state.queue,
+          history: state.history,
+          schedules: state.schedules,
+          eqValues: state.eqValues,
+          theme: state.currentTheme,
+          volume: state.currentVolume,
+          exportedAt: new Date().toISOString()
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tmw-rp-export-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        showToast("Data exported", 1200);
+      }
+
+      function handleKeyboardShortcuts(event) {
+        if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) return;
+
+        const key = event.key.toLowerCase();
+        if (key === " " && !event.repeat) {
+          event.preventDefault();
+          state.playing ? stopPlayback() : playCurrentStation();
+        } else if (key === "s") {
+          stopPlayback();
+        } else if (key === "f") {
+          toggleFavoriteCurrentStation();
+        } else if (key === "q") {
+          queueCurrentStation();
+        } else if (key === "m") {
+          toggleHud();
+        } else if (key === "t") {
+          toggleTheme();
+        } else if (key === "n") {
+          playNextInQueue();
+        } else if (key === "r") {
+          retryCurrentStream();
+        } else if (key === "c") {
+          copyStreamUrl();
+        } else if (key === "e") {
+          exportData();
+        } else if (key === "arrowup") {
+          event.preventDefault();
+          adjustVolume(5);
+        } else if (key === "arrowdown") {
+          event.preventDefault();
+          adjustVolume(-5);
+        }
+      }
+
+      function adjustVolume(delta) {
+        const next = clamp((Number(elements.masterVolume.value) || 80) + delta, 0, 100);
+        elements.masterVolume.value = String(next);
+        state.currentVolume = next;
+        elements.volumeValue.textContent = `${Math.round(next)}%`;
+        localStorage.setItem(STORAGE_KEYS.volume, String(next));
+        if (state.audioEl) state.audioEl.volume = next / 100;
+        if (state.gainNode) state.gainNode.gain.value = next / 100;
+      }
+
+      function fetchJson(url) {
+        return fetch(url, {
+          method: "GET",
+          cache: "no-store",
+          headers: { "Accept": "application/json" }
+        }).then(response => {
+          if (!response.ok) throw new Error("Network error");
+          return response.json();
+        });
+      }
+
+      function normalizeStreamUrl(raw) {
+        if (!raw) return "";
+        return String(raw).trim().replace(/\r/g, "").replace(/\n/g, "");
+      }
+
+      function detectCodecFromUrl(url) {
+        const value = String(url || "").toLowerCase();
+        if (value.includes(".m3u8")) return "HLS";
+        if (value.includes(".aac")) return "AAC";
+        if (value.includes(".mp3")) return "MP3";
+        if (value.includes(".ogg")) return "OGG";
+        if (value.includes(".flac")) return "FLAC";
+        return "Unknown";
+      }
+
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function drawVisualizer() {
+        const canvas = elements.visualizerCanvas;
+        const ctx = canvas.getContext("2d");
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
+
+        if (!state.playing) {
+          drawIdleVisualizer(ctx, width, height);
+          drawHudVisualizer(elements.hudCanvas.getContext("2d"), elements.hudCanvas.width, elements.hudCanvas.height);
+          requestAnimationFrame(drawVisualizer);
+          return;
+        }
+
+        const data = new Uint8Array(48);
+        for (let i = 0; i < data.length; i++) {
+          data[i] = Math.max(18, Math.min(200, Math.random() * 220));
+        }
+
+        if (state.visualizerMode === "spectrum") {
+          drawSpectrum(ctx, width, height, data);
+        } else if (state.visualizerMode === "wave") {
+          drawWaveform(ctx, width, height, data);
+        } else {
+          drawRadial(ctx, width, height, data);
+        }
+
+        drawHudVisualizer(elements.hudCanvas.getContext("2d"), elements.hudCanvas.width, elements.hudCanvas.height);
+        requestAnimationFrame(drawVisualizer);
+      }
+
+      function drawIdleVisualizer(ctx, width, height) {
+        ctx.fillStyle = "rgba(255,255,255,0.02)";
+        ctx.fillRect(0, 0, width, height);
+
+        const gradient = ctx.createLinearGradient(0, 0, width, 0);
+        gradient.addColorStop(0, "rgba(255,239,134,0.1)");
+        gradient.addColorStop(1, "rgba(255,239,134,0.02)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.strokeStyle = "rgba(255,239,134,0.2)";
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i < 18; i += 1) {
+          const x = (i / 18) * width;
+          ctx.beginPath();
+          ctx.moveTo(x, height * 0.2);
+          ctx.lineTo(x, height * 0.8);
+          ctx.stroke();
+        }
+      }
+
+      function drawSpectrum(ctx, width, height, data) {
+        ctx.fillStyle = "rgba(255,255,255,0.02)";
+        ctx.fillRect(0, 0, width, height);
+
+        const barWidth = width / data.length;
+        for (let i = 0; i < data.length; i += 1) {
+          const value = data[i];
+          const barHeight = (value / 255) * (height * 0.85);
+          const x = i * barWidth + 1;
+          const y = height - barHeight;
+
+          const grad = ctx.createLinearGradient(0, y, 0, height);
+          grad.addColorStop(0, "rgba(255,239,134,0.95)");
+          grad.addColorStop(1, "rgba(255,239,134,0.18)");
+          ctx.fillStyle = grad;
+          ctx.fillRect(x, y, barWidth - 2, barHeight);
+        }
+      }
+
+      function drawWaveform(ctx, width, height, data) {
+        ctx.fillStyle = "rgba(255,255,255,0.02)";
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.beginPath();
+        ctx.moveTo(0, height / 2);
+
+        for (let i = 0; i < data.length; i += 1) {
+          const x = (i / (data.length - 1)) * width;
+          const v = ((data[i] / 255) - 0.5) * height * 0.9;
+          const y = height / 2 + v;
+          ctx.lineTo(x, y);
+        }
+
+        ctx.strokeStyle = "rgba(255,239,134,0.9)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      function drawRadial(ctx, width, height, data) {
+        ctx.fillStyle = "rgba(255,255,255,0.02)";
+        ctx.fillRect(0, 0, width, height);
+
+        const cx = width / 2;
+        const cy = height / 2;
+        const baseRadius = Math.min(width, height) * 0.18;
+
+        for (let i = 0; i < data.length; i += 1) {
+          const angle = (i / data.length) * Math.PI * 2;
+          const len = baseRadius + (data[i] / 255) * 120;
+          const x1 = cx + Math.cos(angle) * (baseRadius * 0.5);
+          const y1 = cy + Math.sin(angle) * (baseRadius * 0.5);
+          const x2 = cx + Math.cos(angle) * len;
+          const y2 = cy + Math.sin(angle) * len;
+
+          ctx.strokeStyle = `rgba(255,239,134,${0.2 + (i / data.length) * 0.8})`;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, baseRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,239,134,0.5)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      function drawHudVisualizer(ctx, width, height) {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = "rgba(255,255,255,0.02)";
+        ctx.fillRect(0, 0, width, height);
+
+        const bars = 30;
+        for (let i = 0; i < bars; i += 1) {
+          const h = 8 + Math.random() * 44;
+          const x = i * 11 + 2;
+          const y = height - h - 2;
+          ctx.fillStyle = "rgba(255,239,134,0.65)";
+          ctx.fillRect(x, y, 7, h);
+        }
+      }
+
+      requestAnimationFrame(function renderLoop() {
+        drawVisualizer();
+        requestAnimationFrame(renderLoop);
+      });
+
+      init();
+    })();
+  </script>
 </body>
 </html>
