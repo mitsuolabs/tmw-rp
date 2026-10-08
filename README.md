@@ -4,7 +4,7 @@ TMW-RP is a premium, browser-native radio player built as a single HTML file. It
 
 This project stays intentionally local-first: it runs in the browser without a backend, it uses public station discovery where available, and it keeps the listening experience direct and transparent.
 
-Current version: 1.2
+Current version: 1.2 (note: we needed to rollback due to major bugs; new features will come on 1.3; but down is the description of it).
 
 ## What makes it different
 
