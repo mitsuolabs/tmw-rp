@@ -4,16 +4,17 @@ TMW-RP is a premium, browser-native radio player built as a single HTML file. It
 
 This project stays intentionally local-first: it runs in the browser without a backend, it uses public station discovery where available, and it keeps the listening experience direct and transparent.
 
-Current version: 1.1 (typo was 1.3 on commit)
+Current version: 1.2
 
 ## What makes it different
 
 - Single-file architecture: everything lives in one browser page.
 - No backend required: it runs directly in a browser.
 - Public-source discovery: Radio Browser is the primary discovery layer.
-- Browser-safe stream handling: direct URL input, CSV import, and HLS-aware playback.
+- Browser-safe stream handling: direct URL input, CSV/M3U import, and HLS-aware playback.
 - Premium UX: console layout, metadata panels, HUD mode, visualizer, queue/favorite flow.
 - Computationally local: DSP and audio processing happen in the browser.
+- Better station automation: clock-based scheduler for timed playback and station changes.
 
 ## Core mission
 
@@ -30,7 +31,7 @@ This project is for:
 
 - Radio Browser station discovery
 - direct custom stream URL support
-- CSV import for station lists
+- CSV and M3U playlist import
 - HLS detection and playback handling for .m3u8 sources
 - station favorites and queue
 - browsing history
@@ -38,10 +39,14 @@ This project is for:
 - visualizer and DSP controls
 - HUD mode for compact or car-like viewing
 - browser-only local-first behavior
+- 5-band EQ with presets
+- clock-based scheduler for automatic play/stop/preset actions
+- local export of user state and settings
+- dark and light theme support
 
 ## Version status
 
-This project is currently at version 1.1.
+This project is currently at version 1.2.
 
 For change logs and update reports, see [versions.md](./versions.md).
 
@@ -52,7 +57,7 @@ Open the file directly in a modern browser:
 1. Open `index.html` in a browser.
 2. Use the discovery panel to search stations.
 3. Choose a station or paste a direct URL.
-4. Press Engage Link.
+4. Press Play.
 5. Adjust volume, EQ, HUD, or visualizer settings as needed.
 
 If you prefer a local preview server, you can also serve the project folder with any static file host. The app does not require a backend to function.
