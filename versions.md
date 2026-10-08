@@ -2,10 +2,29 @@
 
 ## Current release
 
-- Version 1.1
-- Release date: 2026-10-06
+- Version 1.2
+- Release date: 2026-10-08
 
 ## Update report
+
+### v1.2 — Maximum viable radio engine
+This release turns the app into a more complete, more resilient browser radio workstation while keeping it lightweight, local-first, and portable.
+
+Key changes:
+- Improved Radio Browser search reliability with multi-fallback station discovery.
+- Added direct stream URL support with stronger custom station handling.
+- Added CSV/M3U playlist import for offline and curated station lists.
+- Expanded favorites, queue, and history management with persistent local storage.
+- Added a clock-based scheduler for timed station switching, stop commands, and EQ preset actions.
+- Added a richer 5-band EQ system with six presets and persistent settings.
+- Improved audio lifecycle handling for play, retry, pause, and station changes.
+- Added live diagnostics for buffer, SNR, latency, and stream quality.
+- Added multiple visualizer modes: spectrum, waveform, and radial.
+- Added HUD overlay mode for compact, dashboard-style monitoring.
+- Added dark/light theme switching.
+- Added export tooling for saving session state and preferences.
+- Improved metadata card accuracy and station refresh flow.
+- Strengthened UI polish with more responsive layout behavior and clearer interaction states.
 
 ### v1.1 — Performance and stability pass
 This update improves the app’s responsiveness and reduces unnecessary work in the browser while preserving the existing feature set.
