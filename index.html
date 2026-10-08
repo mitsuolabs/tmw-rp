@@ -1560,79 +1560,96 @@
         if (!show) elements.customUrlInput.value = "";
       }
 
-      function performSearch() {
-        const source = state.selectedSource;
-        if (source === "custom-url") {
-          const raw = (elements.customUrlInput.value || "").trim();
-          if (!raw) {
-            showToast("Paste a stream URL first", 1600);
-            return;
-          }
+function performSearch() {
+  const source = state.selectedSource;
+  if (source === "custom-url") {
+    const raw = (elements.customUrlInput.value || "").trim();
+    if (!raw) {
+      showToast("Paste a stream URL first", 1600);
+      return;
+    }
 
-          const custom = {
-            name: "Custom Stream",
-            url: raw,
-            stationuuid: `custom-${Date.now()}`,
-            country: "Custom",
-            tags: "custom"
-          };
+    const custom = {
+      name: "Custom Stream",
+      url: raw,
+      stationuuid: `custom-${Date.now()}`,
+      country: "Custom",
+      tags: "custom"
+    };
 
-          state.stations = [custom];
-          renderTargetStations();
-          selectStation(custom);
-          showToast("Custom source loaded", 1400);
-          return;
-        }
+    state.stations = [custom];
+    renderTargetStations();
+    selectStation(custom);
+    showToast("Custom source loaded", 1400);
+    return;
+  }
 
-        if (source === "csv") {
-          elements.csvFileInput.click();
-          return;
-        }
+  if (source === "csv") {
+    elements.csvFileInput.click();
+    return;
+  }
 
-        const query = (elements.searchQuery.value || "").trim();
-        if (!query) {
-          hydrateStations();
-          return;
-        }
+  const query = (elements.searchQuery.value || "").trim();
+  if (!query) {
+    hydrateStations();
+    return;
+  }
 
-        const candidates = [
-          `${state.radioBrowserAPI}/stations/search?name=${encodeURIComponent(query)}&hidebroken=true&limit=40&order=votes&reverse=true`,
-          `${state.radioBrowserAPI}/stations/search?tag=${encodeURIComponent(query)}&hidebroken=true&limit=40&order=votes&reverse=true`,
-          `${state.radioBrowserAPI}/stations/search?country=${encodeURIComponent(query)}&hidebroken=true&limit=40&order=votes&reverse=true`
-        ];
+  updateBrandStatus("Searching...");
+  showToast("Searching Radio Browser...", 2000);
 
-        searchWithFallback(candidates);
+  const candidates = [
+    {
+      name: "By Station Name",
+      url: `${state.radioBrowserAPI}/stations/search?name=${encodeURIComponent(query)}&hidebroken=true&limit=50&order=votes&reverse=true`
+    },
+    {
+      name: "By Tag/Genre",
+      url: `${state.radioBrowserAPI}/stations/search?tag=${encodeURIComponent(query)}&hidebroken=true&limit=50&order=votes&reverse=true`
+    },
+    {
+      name: "By Country",
+      url: `${state.radioBrowserAPI}/stations/search?country=${encodeURIComponent(query)}&hidebroken=true&limit=50&order=votes&reverse=true`
+    },
+    {
+      name: "By Language",
+      url: `${state.radioBrowserAPI}/stations/search?language=${encodeURIComponent(query)}&hidebroken=true&limit=50&order=votes&reverse=true`
+    }
+  ];
+
+  searchWithFallback(candidates, 0);
+}
+
+function searchWithFallback(candidates, index) {
+  if (index >= candidates.length) {
+    updateBrandStatus("No results");
+    showToast("No stations found. Try a different search.", 1800);
+    return;
+  }
+
+  const candidate = candidates[index];
+  
+  console.log(`Searching: ${candidate.name} - ${candidate.url}`);
+
+  fetchJson(candidate.url)
+    .then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        state.stations = data;
+        renderTargetStations();
+        selectStation(state.stations[0]);
+        updateBrandStatus("Found");
+        showToast(`Found ${state.stations.length} stations (${candidate.name})`, 1400);
+        return;
       }
 
-      function searchWithFallback(candidates) {
-        let index = 0;
-
-        function next() {
-          if (index >= candidates.length) {
-            showToast("No results from Radio Browser", 1700);
-            return;
-          }
-
-          fetchJson(candidates[index])
-            .then(data => {
-              if (Array.isArray(data) && data.length) {
-                state.stations = data;
-                renderTargetStations();
-                selectStation(state.stations[0]);
-                showToast(`Found ${state.stations.length} stations`, 1200);
-                return;
-              }
-              index += 1;
-              next();
-            })
-            .catch(() => {
-              index += 1;
-              next();
-            });
-        }
-
-        next();
-      }
+      console.log(`${candidate.name} returned no results, trying next...`);
+      searchWithFallback(candidates, index + 1);
+    })
+    .catch(err => {
+      console.warn(`Search failed on ${candidate.name}:`, err);
+      searchWithFallback(candidates, index + 1);
+    });
+}
 
       function hydrateStations() {
         const urls = [
