@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TMW-RP v1.2</title>
+  <title>TMW-RP | Enhanced Radio Engine</title>
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'none';
     script-src 'self' 'unsafe-inline';
@@ -16,26 +16,49 @@
     form-action 'none';
   " />
   <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
+  <meta http-equiv="Permissions-Policy" content="
+    accelerometer=(),
+    ambient-light-sensor=(),
+    battery=(),
+    camera=(),
+    display-capture=(),
+    document-domain=(),
+    encrypted-media=(),
+    fullscreen=(self),
+    gyroscope=(),
+    geolocation=(),
+    microphone=(),
+    midi=(),
+    payment=(),
+    picture-in-picture=(),
+    screen-wake-lock=()
+  " />
   <meta name="referrer" content="no-referrer" />
   <meta name="X-Content-Type-Options" content="nosniff" />
   <meta name="X-Frame-Options" content="DENY" />
   <style>
     :root {
-      --bg-0: #06080d;
+      --bg-0: #05070b;
       --bg-1: #0d1117;
       --bg-2: #121922;
       --panel: rgba(255,255,255,0.035);
-      --panel-strong: rgba(255,255,255,0.08);
+      --panel-strong: rgba(255,255,255,0.07);
+      --panel-soft: rgba(255,255,255,0.025);
       --line: rgba(255,255,255,0.12);
+      --line-strong: rgba(255,255,255,0.2);
       --text: #f7f3de;
       --text-strong: #ffffff;
       --muted: #b9bcc8;
+      --muted-2: #8e93a7;
       --accent: #ffef86;
       --accent-2: #ffe66d;
+      --accent-3: #fff9c4;
       --success: #7cf2b1;
       --warning: #ffd166;
       --danger: #ff6b6b;
       --info: #86d9ff;
+      --shadow: rgba(0,0,0,0.45);
+      --radius: 12px;
       --transition: 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
@@ -45,6 +68,7 @@
       margin: 0;
       padding: 0;
       height: 100%;
+      min-height: 100%;
       background: var(--bg-0);
       color: var(--text);
       font-family: var(--font);
@@ -57,21 +81,36 @@
       scrollbar-color: rgba(255,239,134,0.35) transparent;
     }
 
-    *::-webkit-scrollbar { width: 10px; }
-    *::-webkit-scrollbar-thumb { background: rgba(255,239,134,0.28); border-radius: 999px; }
+    *::-webkit-scrollbar { width: 10px; height: 10px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    *::-webkit-scrollbar-thumb {
+      background: rgba(255,239,134,0.28);
+      border-radius: 999px;
+    }
 
-    ::selection { background: rgba(255,239,134,0.2); color: var(--text-strong); }
+    ::selection {
+      background: rgba(255,239,134,0.2);
+      color: var(--text-strong);
+    }
 
-    body { display: grid; grid-template-columns: 480px minmax(0, 1fr); }
+    a { color: inherit; }
+    button, select, input, textarea { font: inherit; }
+
+    body {
+      display: grid;
+      grid-template-columns: 450px minmax(0, 1fr);
+    }
 
     .console {
       position: relative;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      padding: 26px 24px 18px;
+      padding: 26px 24px 20px;
       border-right: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(5,7,11,0.96), rgba(18,25,34,0.74)), radial-gradient(circle at top left, rgba(255,239,134,0.08), transparent 30%);
+      background:
+        linear-gradient(180deg, rgba(5,7,11,0.96), rgba(18,25,34,0.74)),
+        radial-gradient(circle at top left, rgba(255,239,134,0.08), transparent 30%);
       overflow-y: auto;
     }
 
@@ -86,41 +125,49 @@
     .brand-header {
       position: relative;
       z-index: 1;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       padding-bottom: 14px;
       border-bottom: 1px solid var(--line);
     }
 
     .brand-header h1 {
       margin: 0;
-      font-weight: 600;
-      font-size: 1.3rem;
+      font-size: 1.22rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--accent);
+      font-weight: 600;
     }
 
     .brand-header p {
       margin-top: 6px;
-      color: var(--muted);
       font-size: 0.68rem;
-      letter-spacing: 0.17em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .brand-tagline {
+      margin-top: 5px;
+      font-size: 0.58rem;
+      color: rgba(255,239,134,0.5);
+      font-style: italic;
+      letter-spacing: 0.05em;
     }
 
     .control-group {
       position: relative;
       z-index: 1;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .control-group label {
       display: block;
       margin-bottom: 8px;
-      color: var(--muted);
       font-size: 0.62rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
+      color: var(--muted);
     }
 
     select, input[type="text"], input[type="search"], input[type="time"], input[type="number"], input[type="file"], textarea {
@@ -132,7 +179,7 @@
       padding: 10px 12px;
       font-size: 0.88rem;
       outline: none;
-      transition: border-color var(--transition), box-shadow var(--transition);
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
     }
 
     select:focus, input:focus, textarea:focus {
@@ -142,7 +189,7 @@
     }
 
     select option { background: #0d1117; color: var(--text); }
-    input::placeholder { color: rgba(185,188,200,0.7); }
+    input::placeholder, textarea::placeholder { color: rgba(185,188,200,0.7); }
 
     button {
       appearance: none;
@@ -155,11 +202,22 @@
       font-size: 0.7rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      transition: all var(--transition);
+      transition: border-color var(--transition), background var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition);
     }
 
-    button:hover { border-color: rgba(255,239,134,0.6); background: rgba(255,239,134,0.05); color: var(--accent); transform: translateY(-1px); }
-    button:focus-visible { outline: 2px solid rgba(255,239,134,0.9); outline-offset: 2px; }
+    button:hover {
+      border-color: rgba(255,239,134,0.6);
+      background: rgba(255,239,134,0.05);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    button:active { transform: translateY(0); }
+
+    button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid rgba(255,239,134,0.9);
+      outline-offset: 2px;
+    }
 
     .btn-primary {
       background: var(--text);
@@ -175,16 +233,37 @@
       box-shadow: 0 0 22px rgba(255,239,134,0.2);
     }
 
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.18);
+    }
+
     .btn-danger {
       background: rgba(255,107,107,0.08);
       border-color: rgba(255,107,107,0.36);
       color: #ffc1c1;
     }
 
-    .btn-sm { padding: 7px 10px; font-size: 0.6rem; }
+    .btn-success {
+      background: rgba(124,242,177,0.08);
+      border-color: rgba(124,242,177,0.36);
+      color: #b8f5d8;
+    }
 
-    .row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .row > button, .row > input { flex: 1; }
+    .btn-sm {
+      padding: 7px 10px;
+      font-size: 0.6rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .row > button, .row > input {
+      flex: 1;
+    }
 
     .eq-matrix {
       position: relative;
@@ -196,7 +275,7 @@
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 10px;
-      padding: 12px 8px;
+      padding: 12px 8px 12px;
       min-height: 150px;
     }
 
@@ -217,6 +296,36 @@
       height: 72px;
       margin: 0;
       padding: 0;
+      background: transparent;
+    }
+
+    .eq-band input[type="range"]::-webkit-slider-runnable-track {
+      background: linear-gradient(180deg, rgba(255,239,134,0.3), rgba(255,255,255,0.08));
+      border-radius: 999px;
+    }
+
+    .eq-band input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      border: 0;
+      box-shadow: 0 0 0 2px rgba(255,239,134,0.15);
+      margin-left: -2px;
+    }
+
+    .eq-band input[type="range"]::-moz-range-track {
+      background: linear-gradient(180deg, rgba(255,239,134,0.3), rgba(255,255,255,0.08));
+      border-radius: 999px;
+    }
+
+    .eq-band input[type="range"]::-moz-range-thumb {
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border: 0;
+      border-radius: 50%;
     }
 
     .eq-band span {
@@ -256,7 +365,7 @@
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 10px;
       padding: 11px 12px;
-      margin-top: 12px;
+      margin-top: 14px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
@@ -280,12 +389,13 @@
       border-radius: 9px;
       padding: 10px 11px;
       min-height: 78px;
-      transition: border-color var(--transition), transform var(--transition);
+      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
     }
 
     .meta-card:hover {
       border-color: rgba(255,239,134,0.28);
       transform: translateY(-1px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 20px rgba(0,0,0,0.16);
     }
 
     .meta-label {
@@ -317,7 +427,7 @@
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 8px;
-      padding: 9px;
+      padding: 9px 9px 8px;
     }
 
     .metadata-item .k {
@@ -342,7 +452,7 @@
       border-radius: 8px;
     }
 
-    .favorites-list, .queue-list, .history-list, .scheduler-list {
+    .favorites-list, .queue-list, .history-list, .scheduler-list, .manual-list, .notices-list {
       list-style: none;
       display: flex;
       flex-direction: column;
@@ -351,7 +461,7 @@
       padding: 0;
     }
 
-    .favorites-list li, .queue-list li, .history-list li, .scheduler-list li {
+    .favorites-list li, .queue-list li, .history-list li, .scheduler-list li, .manual-list li, .notices-list li {
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 7px;
@@ -360,10 +470,10 @@
       line-height: 1.4;
       color: var(--text);
       cursor: pointer;
-      transition: all var(--transition);
+      transition: border-color var(--transition), background var(--transition), transform var(--transition);
     }
 
-    .favorites-list li:hover, .queue-list li:hover, .history-list li:hover, .scheduler-list li:hover {
+    .favorites-list li:hover, .queue-list li:hover, .history-list li:hover, .scheduler-list li:hover, .manual-list li:hover, .notices-list li:hover {
       background: rgba(255,239,134,0.04);
       border-color: rgba(255,239,134,0.28);
       transform: translateY(-1px);
@@ -409,6 +519,10 @@
       margin-top: 6px;
     }
 
+    .pill-success { border-color: rgba(124,242,177,0.5); background: rgba(124,242,177,0.1); color: #a8f0d0; }
+    .pill-warning { border-color: rgba(255,209,102,0.5); background: rgba(255,209,102,0.1); color: #ffe0a8; }
+    .pill-danger { border-color: rgba(255,107,107,0.5); background: rgba(255,107,107,0.1); color: #ffc1c1; }
+
     .hidden { display: none !important; }
 
     .stage {
@@ -417,7 +531,9 @@
       min-width: 0;
       min-height: 100vh;
       padding: clamp(18px, 2vw, 38px);
-      background: radial-gradient(circle at 85% 10%, rgba(255,239,134,0.08), transparent 24%), linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0));
+      background:
+        radial-gradient(circle at 85% 10%, rgba(255,239,134,0.08), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0));
     }
 
     .stage::before {
@@ -452,6 +568,20 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       padding: 5px 9px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 0.56rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 8px;
     }
 
     .stream-title {
@@ -536,7 +666,7 @@
       text-transform: uppercase;
       cursor: pointer;
       padding: 8px 6px;
-      transition: all var(--transition);
+      transition: border-color var(--transition), color var(--transition), background var(--transition), transform var(--transition);
     }
 
     .feature-chip:hover, .feature-chip.active {
@@ -579,7 +709,7 @@
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 8px;
-      padding: 9px;
+      padding: 9px 9px 8px;
     }
 
     .insight-stat strong {
@@ -879,9 +1009,13 @@
 
     .scheduler-row {
       display: grid;
-      grid-template-columns: auto 1fr auto 1fr 60px;
+      grid-template-columns: auto 1fr auto 1fr 1fr;
       gap: 6px;
       align-items: center;
+    }
+
+    .scheduler-row input[type="time"], .scheduler-row input[type="text"], .scheduler-row select {
+      font-size: 0.8rem;
     }
 
     .timer-display {
@@ -917,17 +1051,27 @@
 
     @media (max-width: 1100px) {
       body { display: block; overflow-y: auto; }
-      .console { min-height: auto; border-right: none; border-bottom: 1px solid var(--line); }
-      .stage { min-height: auto; max-height: none; overflow: visible; }
-      .advanced-rail, .bottom-panels { grid-template-columns: 1fr; }
+      .console {
+        min-height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+      .stage {
+        min-height: auto;
+        max-height: none;
+        overflow: visible;
+      }
+      .advanced-rail { grid-template-columns: 1fr; }
       .feature-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .bottom-panels { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 720px) {
       .eq-matrix { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-      .metadata-sheet, .meta-grid, .bottom-panels { grid-template-columns: 1fr; }
+      .metadata-sheet, .meta-grid, .bottom-panels, .scheduler-row { grid-template-columns: 1fr; }
       .feature-strip { grid-template-columns: 1fr; }
       .row { flex-direction: column; }
+      .scheduler-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -935,26 +1079,26 @@
   <aside class="console">
     <div class="brand-header">
       <h1>📻 TMW-RP</h1>
-      <p>The MitsuoLabs Web Radio Player v1.2</p>
+      <p>Web Radio Engine</p>
+      <div class="brand-tagline">Local-first, browser-native, always open</div>
     </div>
 
     <div class="control-group">
       <label>Discovery Source</label>
       <select id="registry-base">
-        <option value="radiobrowser">Radio Browser API</option>
+        <option value="radiobrowser">Radio Browser (Decentralized)</option>
         <option value="custom-url">Direct Stream URL</option>
-        <option value="csv">CSV / M3U Playlist</option>
+        <option value="csv">CSV / Playlist Import</option>
       </select>
     </div>
 
     <div class="control-group">
       <label>Search & Filter</label>
-      <input type="text" id="search-query" placeholder="Genre, country, station..." />
-      <input type="text" id="custom-url-input" class="hidden" placeholder="Paste stream URL..." />
-      <input type="file" id="csv-file-input" class="hidden" accept=".csv,.m3u,.txt" />
+      <input type="text" id="search-query" placeholder="Artist, genre, country, or station..." />
+      <input type="text" id="custom-url-input" class="hidden" placeholder="Paste stream URL (MP3, AAC, M3U8)" />
       <div class="row">
         <button id="btn-query">Search</button>
-        <button id="btn-clear-search" class="btn-sm">Clear</button>
+        <button id="btn-clear-search" class="btn-secondary btn-sm">Clear</button>
       </div>
     </div>
 
@@ -971,9 +1115,9 @@
     </div>
 
     <div class="row">
-      <button id="btn-favorite" class="btn-sm">♥ Add</button>
-      <button id="btn-queue" class="btn-sm">⬕ Queue</button>
-      <button id="btn-next-queue" class="btn-sm">Next</button>
+      <button id="btn-favorite" class="btn-secondary btn-sm">♥ Add</button>
+      <button id="btn-queue" class="btn-secondary btn-sm">⬕ Queue</button>
+      <button id="btn-next-queue" class="btn-secondary btn-sm">Next</button>
     </div>
 
     <div class="panel-block">
@@ -981,21 +1125,21 @@
       <div class="scheduler-ui">
         <div class="scheduler-row">
           <input type="time" id="schedule-time" />
-          <select id="schedule-action" style="font-size: 0.8rem;">
+          <select id="schedule-action">
             <option value="play">Play</option>
             <option value="stop">Stop</option>
-            <option value="preset">Preset</option>
+            <option value="preset">Load Preset</option>
           </select>
-          <button id="btn-add-schedule" class="btn-sm" style="width: 60px; padding: 7px 5px;">Add</button>
+          <button id="btn-add-schedule" class="btn-sm" style="width: 60px;">Add</button>
         </div>
         <div class="timer-display" id="next-schedule-info">No scheduled events</div>
         <ul id="scheduler-list" class="scheduler-list">
-          <li>No schedules.</li>
+          <li>No schedules set.</li>
         </ul>
       </div>
     </div>
 
-    <div class="control-group" style="margin-top: 10px;">
+    <div class="control-group" style="margin-top: 12px;">
       <label>5-Band Equalizer</label>
       <div class="eq-matrix" id="eq-matrix">
         <div class="eq-band">
@@ -1110,11 +1254,11 @@
 
     <div class="panel-block">
       <h3>💡 Resources</h3>
-      <ul class="favorites-list">
-        <li><a href="#" data-open-modal="about" style="text-decoration: none; color: var(--accent);">About TMW-RP</a></li>
-        <li><a href="#" data-open-modal="shortcuts" style="text-decoration: none; color: var(--accent);">Keyboard Shortcuts</a></li>
-        <li><a href="#" data-open-modal="troubleshooting" style="text-decoration: none; color: var(--accent);">Troubleshooting</a></li>
-        <li><a href="#" data-open-modal="stats" style="text-decoration: none; color: var(--accent);">Session Stats</a></li>
+      <ul class="manual-list">
+        <li><a href="#" data-open-modal="about">About TMW-RP</a></li>
+        <li><a href="#" data-open-modal="shortcuts">Keyboard Help</a></li>
+        <li><a href="#" data-open-modal="troubleshooting">Troubleshooting</a></li>
+        <li><a href="#" data-open-modal="stats">Session Stats</a></li>
       </ul>
     </div>
   </aside>
@@ -1127,7 +1271,7 @@
           <span class="stream-title" id="stream-title">No stream loaded</span>
         </div>
         <h2 id="now-playing-title">Waiting for a signal</h2>
-        <p class="subtitle" id="now-playing-subtitle">Local-first playback • Zero tracking • Open standards</p>
+        <p class="subtitle" id="now-playing-subtitle">Local-first playback engine • Zero tracking • Open standards</p>
         <div class="time-display" id="time-display">--</div>
       </section>
 
@@ -1232,7 +1376,7 @@
   </div>
 
   <div id="modal-overlay" class="modal-overlay hidden" aria-hidden="true">
-    <div class="modal-panel" role="dialog" aria-modal="true">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="modal-header">
         <h2 id="modal-title">Modal Title</h2>
         <button class="modal-close" id="modal-close">Close</button>
@@ -1242,17 +1386,19 @@
   </div>
 
   <script>
-    (() => {
+    (function () {
       "use strict";
 
       const STORAGE_KEYS = {
-        favorites: "tmw_rp_v12_favorites",
-        queue: "tmw_rp_v12_queue",
-        history: "tmw_rp_v12_history",
-        theme: "tmw_rp_v12_theme",
-        eq: "tmw_rp_v12_eq",
-        volume: "tmw_rp_v12_volume",
-        schedules: "tmw_rp_v12_schedules"
+        favorites: "tmw_rp_fav_v2",
+        queue: "tmw_rp_queue_v2",
+        history: "tmw_rp_hist_v2",
+        theme: "tmw_rp_theme_v2",
+        eq: "tmw_rp_eq_v2",
+        volume: "tmw_rp_vol_v2",
+        lastStation: "tmw_rp_last_v2",
+        schedules: "tmw_rp_sched_v2",
+        sessionStart: "tmw_rp_start_v2"
       };
 
       const state = {
@@ -1265,71 +1411,56 @@
         currentStation: null,
         currentStreamUrl: "",
         playing: false,
-        audioEl: null,
+        isAudioReady: false,
         audioContext: null,
         mediaSource: null,
         gainNode: null,
         eqNodes: [],
         visualizerMode: "spectrum",
         currentTheme: "dark",
+        lastStationUrl: "",
         currentPreset: "flat",
         eqValues: [0, 0, 0, 0, 0],
         currentVolume: 80,
         playSeconds: 0,
         sessionUptime: 0,
+        audioEl: null,
         sessionStartTime: Date.now(),
         radioBrowserAPI: "https://de1.api.radio-browser.info/json",
-        stationSearchApis: [
-          "https://fr1.api.radio-browser.info/json",
-          "https://nl1.api.radio-browser.info/json"
-        ],
-        buffer: 0,
-        snr: 0,
-        latency: 0,
-        quality: 0
+        activeSchedule: null
       };
 
       const modalMap = {
         about: [
-          "TMW-RP v1.2 is a browser-native radio engine.",
-          "✓ Radio Browser API discovery (decentralized)",
-          "✓ Direct stream URL support",
-          "✓ M3U / CSV playlist import",
-          "✓ Favorites, queue, history with persistence",
-          "✓ 5-band EQ with 6 presets",
-          "✓ 3 visualizer modes",
-          "✓ Clock-based scheduler for automation",
-          "✓ Live signal diagnostics & HUD overlay",
-          "✓ Dark & light theme",
-          "✓ Full data export",
-          "Zero telemetry. All data local."
+          "TMW-RP is a browser-native, local-first radio engine.",
+          "Features: Radio Browser integration, EQ presets, live visualizers, favorites, scheduling, and zero telemetry.",
+          "All data stays on your device. No cloud sync, no tracking.",
+          "Built for clarity, respect, and pure audio pleasure."
         ],
         shortcuts: [
-          "SPACE — Play/Pause",
-          "S — Stop | F — Toggle Favorite",
-          "Q — Queue Current | N — Next in Queue",
-          "M — HUD Toggle | T — Theme",
-          "↑/↓ — Volume Control",
-          "R — Retry Stream | C — Copy URL",
-          "E — Export Data"
+          "Space — Play/Pause | S — Stop | F — Favorite",
+          "Q — Queue | M — HUD Mode | T — Toggle Theme",
+          "↑/↓ — Volume | N — Next Queue | R — Reconnect",
+          "C — Copy Stream URL | E — Export Data"
         ],
         troubleshooting: [
-          "Stream won't play? Try a different search result or paste a direct URL.",
-          "CORS error? Some streams require HTTPS. Use a CORS proxy if needed.",
-          "Autoplay blocked? Browser security. Click Play again.",
-          "No metadata? Click Refresh or select another station.",
-          "Audio cuts out? Check buffer in Signal Health. Network issues?"
+          "Stream fails? Try a different source or direct URL.",
+          "CORS blocking? Some streams require HTTPS or CORS headers.",
+          "Autoplay blocked? Browser privacy rules — click Play again.",
+          "Metadata not updating? Use Refresh or switch stations.",
+          "Audio cuts out? Check buffer percentage in Signal Health panel."
         ],
         stats: [
-          "Session Uptime: Time since page load.",
-          "Playtime: Duration of active playback.",
-          "Stations Scanned: Total discovery queries.",
-          "Favorites: Persisted across sessions.",
-          "Schedules: Timezone-aware automation.",
-          "Export: Full JSON backup of library."
+          "Session Uptime: Measured from page load.",
+          "Playback Time: Actual listening duration.",
+          "Stations Scanned: Total unique stations queried.",
+          "Favorites: Persistent across sessions.",
+          "Schedules: Stored locally, timezone-aware.",
+          "Data Format: All JSON, exportable as .json files."
         ]
       };
 
+      const defaultEQ = [0, 0, 0, 0, 0];
       const presetMap = {
         flat: [0, 0, 0, 0, 0],
         bass: [5, 4, 1.5, 0, -2],
@@ -1348,14 +1479,14 @@
         setTheme(state.currentTheme);
         installAudio();
         applyEqPreset("flat");
+        updateInsightStats();
         updateBrandStatus("Standby");
         updateMetadataCard();
         setCurrentTitle("Waiting for a signal");
-        showToast("TMW-RP v1.2 ready", 1600);
-
+        showToast("TMW-RP ready", 1600);
         startSessionTimers();
         hydrateStations();
-        updateSignalDiagnostics();
+        scheduleNextEvent();
 
         setInterval(updateTimeDisplay, 1000);
         setInterval(() => {
@@ -1364,15 +1495,12 @@
           }
         }, 2000);
         setInterval(checkSchedules, 5000);
-
-        requestAnimationFrame(drawVisualizer);
       }
 
       function cacheElements() {
         elements.registryBase = document.getElementById("registry-base");
         elements.searchQuery = document.getElementById("search-query");
         elements.customUrlInput = document.getElementById("custom-url-input");
-        elements.csvFileInput = document.getElementById("csv-file-input");
         elements.targetStation = document.getElementById("target-station");
         elements.btnQuery = document.getElementById("btn-query");
         elements.btnClearSearch = document.getElementById("btn-clear-search");
@@ -1462,13 +1590,13 @@
           state.schedules = Array.isArray(schedules) ? schedules : [];
           state.currentTheme = ["dark", "light"].includes(theme) ? theme : "dark";
           state.currentVolume = isNaN(volume) ? 80 : clamp(volume, 0, 100);
-          state.eqValues = (Array.isArray(eq) && eq.length === 5) ? eq.map(Number) : [0,0,0,0,0];
+          state.eqValues = (Array.isArray(eq) && eq.length === 5) ? eq.map(Number) : defaultEQ.slice();
         } catch (err) {
           state.favorites = [];
           state.queue = [];
           state.history = [];
           state.schedules = [];
-          state.eqValues = [0,0,0,0,0];
+          state.eqValues = defaultEQ.slice();
           state.currentTheme = "dark";
           state.currentVolume = 80;
         }
@@ -1495,12 +1623,29 @@
         elements.btnQueue.addEventListener("click", queueCurrentStation);
         elements.btnNextQueue.addEventListener("click", playNextInQueue);
         elements.btnRetry.addEventListener("click", retryCurrentStream);
+        elements.btnToggleHud = elements.btnToggleHud || { addEventListener: function(){} };
+        elements.btnTheme = elements.btnTheme || { addEventListener: function(){} };
+        elements.btnRefreshMeta = elements.btnRefreshMeta || { addEventListener: function(){} };
+        elements.btnCopyUrl = elements.btnCopyUrl || { addEventListener: function(){} };
+        elements.btnExport = elements.btnExport || { addEventListener: function(){} };
+
+        if (elements.btnToggleHud && elements.btnToggleHud.addEventListener) {
+          elements.btnToggleHud.addEventListener("click", toggleHud);
+        }
+        if (elements.btnTheme && elements.btnTheme.addEventListener) {
+          elements.btnTheme.addEventListener("click", toggleTheme);
+        }
+        if (elements.btnRefreshMeta && elements.btnRefreshMeta.addEventListener) {
+          elements.btnRefreshMeta.addEventListener("click", refreshMetadataNow);
+        }
+        if (elements.btnCopyUrl && elements.btnCopyUrl.addEventListener) {
+          elements.btnCopyUrl.addEventListener("click", copyStreamUrl);
+        }
+        if (elements.btnExport && elements.btnExport.addEventListener) {
+          elements.btnExport.addEventListener("click", exportData);
+        }
+
         elements.btnAddSchedule.addEventListener("click", addScheduleEvent);
-        elements.btnToggleHud.addEventListener("click", toggleHud);
-        elements.btnTheme.addEventListener("click", toggleTheme);
-        elements.btnRefreshMeta.addEventListener("click", refreshMetadataNow);
-        elements.btnCopyUrl.addEventListener("click", copyStreamUrl);
-        elements.btnExport.addEventListener("click", exportData);
 
         elements.targetStation.addEventListener("change", function () {
           if (!this.value) return;
@@ -1528,26 +1673,27 @@
 
         elements.presetChips.forEach(chip => {
           chip.addEventListener("click", function () {
-            applyEqPreset(chip.dataset.preset);
+            const preset = this.dataset.preset;
+            applyEqPreset(preset);
           });
         });
 
         elements.featureChips.forEach(chip => {
           chip.addEventListener("click", function () {
-            state.visualizerMode = chip.dataset.visualizer;
-            elements.featureChips.forEach(c => c.classList.toggle("active", c === chip));
+            state.visualizerMode = this.dataset.visualizer;
+            elements.featureChips.forEach(item => item.classList.toggle("active", item === this));
           });
         });
 
         elements.modalClose.addEventListener("click", closeModal);
-        elements.modalOverlay.addEventListener("click", e => {
-          if (e.target === elements.modalOverlay) closeModal();
+        elements.modalOverlay.addEventListener("click", event => {
+          if (event.target === elements.modalOverlay) closeModal();
         });
 
         elements.modalLinks.forEach(link => {
-          link.addEventListener("click", e => {
-            e.preventDefault();
-            openModal(link.dataset.openModal);
+          link.addEventListener("click", event => {
+            event.preventDefault();
+            openModal(this.dataset.openModal);
           });
         });
 
@@ -1560,126 +1706,44 @@
         if (!show) elements.customUrlInput.value = "";
       }
 
-function performSearch() {
-  const source = state.selectedSource;
-  if (source === "custom-url") {
-    const raw = (elements.customUrlInput.value || "").trim();
-    if (!raw) {
-      showToast("Paste a stream URL first", 1600);
-      return;
-    }
-
-    const custom = {
-      name: "Custom Stream",
-      url: raw,
-      stationuuid: `custom-${Date.now()}`,
-      country: "Custom",
-      tags: "custom"
-    };
-
-    state.stations = [custom];
-    renderTargetStations();
-    selectStation(custom);
-    showToast("Custom source loaded", 1400);
-    return;
-  }
-
-  if (source === "csv") {
-    elements.csvFileInput.click();
-    return;
-  }
-
-  const query = (elements.searchQuery.value || "").trim();
-  if (!query) {
-    hydrateStations();
-    return;
-  }
-
-  updateBrandStatus("Searching...");
-  showToast("Searching Radio Browser...", 2000);
-
-  const candidates = [
-    {
-      name: "By Station Name",
-      url: `${state.radioBrowserAPI}/stations/search?name=${encodeURIComponent(query)}&hidebroken=true&limit=50&order=votes&reverse=true`
-    },
-    {
-      name: "By Tag/Genre",
-      url: `${state.radioBrowserAPI}/stations/search?tag=${encodeURIComponent(query)}&hidebroken=true&limit=50&order=votes&reverse=true`
-    },
-    {
-      name: "By Country",
-      url: `${state.radioBrowserAPI}/stations/search?country=${encodeURIComponent(query)}&hidebroken=true&limit=50&order=votes&reverse=true`
-    },
-    {
-      name: "By Language",
-      url: `${state.radioBrowserAPI}/stations/search?language=${encodeURIComponent(query)}&hidebroken=true&limit=50&order=votes&reverse=true`
-    }
-  ];
-
-  searchWithFallback(candidates, 0);
-}
-
-function searchWithFallback(candidates, index) {
-  if (index >= candidates.length) {
-    updateBrandStatus("No results");
-    showToast("No stations found. Try a different search.", 1800);
-    return;
-  }
-
-  const candidate = candidates[index];
-  
-  console.log(`Searching: ${candidate.name} - ${candidate.url}`);
-
-  fetchJson(candidate.url)
-    .then(data => {
-      if (Array.isArray(data) && data.length > 0) {
-        state.stations = data;
-        renderTargetStations();
-        selectStation(state.stations[0]);
-        updateBrandStatus("Found");
-        showToast(`Found ${state.stations.length} stations (${candidate.name})`, 1400);
-        return;
-      }
-
-      console.log(`${candidate.name} returned no results, trying next...`);
-      searchWithFallback(candidates, index + 1);
-    })
-    .catch(err => {
-      console.warn(`Search failed on ${candidate.name}:`, err);
-      searchWithFallback(candidates, index + 1);
-    });
-}
-
-      function hydrateStations() {
-        const urls = [
-          `${state.radioBrowserAPI}/stations?limit=35&hidebroken=true&order=votes&reverse=true`,
-          `${state.radioBrowserAPI}/stations/search?tag=rock&hidebroken=true&limit=20&order=votes&reverse=true`
-        ];
-
-        let index = 0;
-
-        function next() {
-          if (index >= urls.length) return;
-
-          fetchJson(urls[index])
-            .then(data => {
-              if (Array.isArray(data) && data.length) {
-                state.stations = data;
-                renderTargetStations();
-                selectStation(state.stations[0]);
-                return;
-              }
-              index += 1;
-              next();
-            })
-            .catch(() => {
-              index += 1;
-              next();
-            });
+      function performSearch() {
+        const query = (elements.searchQuery.value || "").trim();
+        if (!query) {
+          hydrateStations();
+          return;
         }
 
-        next();
+        const encoded = encodeURIComponent(query);
+        const url = `${state.radioBrowserAPI}/stations/search?name=${encoded}&hidebroken=true&limit=50&order=votes&reverse=true`;
+
+        fetchJson(url)
+          .then(data => {
+            state.stations = Array.isArray(data) ? data : [];
+            renderTargetStations();
+            if (state.stations.length) {
+              selectStation(state.stations[0]);
+              showToast(`Found ${state.stations.length} stations`, 1200);
+            } else {
+              showToast("No results. Try a broader search.", 1600);
+            }
+          })
+          .catch(() => {
+            showToast("Search failed. Check your connection.", 1800);
+          });
+      }
+
+      function hydrateStations() {
+        const url = `${state.radioBrowserAPI}/stations?limit=30&hidebroken=true&order=votes&reverse=true`;
+        fetchJson(url)
+          .then(data => {
+            state.stations = Array.isArray(data) ? data : [];
+            renderTargetStations();
+            if (state.stations.length) selectStation(state.stations[0]);
+            updateInsightStats();
+          })
+          .catch(() => {
+            showToast("Failed to load stations", 1800);
+          });
       }
 
       function renderTargetStations() {
@@ -1694,7 +1758,6 @@ function searchWithFallback(candidates, index) {
 
       function selectStation(station) {
         if (!station) return;
-
         state.currentStation = station;
         state.currentStreamUrl = station.url || station.urlResolved || "";
 
@@ -1744,6 +1807,7 @@ function searchWithFallback(candidates, index) {
         });
 
         state.audioEl.addEventListener("canplay", () => {
+          state.isAudioReady = true;
           updateBrandStatus("Ready");
           elements.streamStatus.textContent = "Ready";
           showToast("Signal ready", 900);
@@ -1772,11 +1836,11 @@ function searchWithFallback(candidates, index) {
           state.playing = false;
           updateBrandStatus("Error");
           elements.streamStatus.textContent = "Error";
-          showToast("Playback error.", 1800);
+          showToast("Playback error. Retrying...", 1800);
         });
 
         state.audioEl.addEventListener("timeupdate", () => {
-          if (state.audioEl && Number.isFinite(state.audioEl.currentTime)) {
+          if (state.audioEl && isFinite(state.audioEl.currentTime)) {
             updatePlaytime();
           }
         });
@@ -1809,7 +1873,7 @@ function searchWithFallback(candidates, index) {
           const nodes = [];
           let current = state.mediaSource;
 
-          for (let i = 0; i < 5; i += 1) {
+          for (let i = 0; i < 5; i++) {
             const filter = state.audioContext.createBiquadFilter();
             filter.type = "peaking";
             filter.frequency.value = [60, 230, 910, 3600, 14000][i];
@@ -1821,7 +1885,7 @@ function searchWithFallback(candidates, index) {
           if (nodes.length) {
             state.eqNodes = nodes;
             current.connect(nodes[0]);
-            for (let i = 0; i < nodes.length - 1; i += 1) {
+            for (let i = 0; i < nodes.length - 1; i++) {
               nodes[i].connect(nodes[i + 1]);
             }
             nodes[nodes.length - 1].connect(state.gainNode);
@@ -1831,7 +1895,7 @@ function searchWithFallback(candidates, index) {
 
           state.gainNode.connect(state.audioContext.destination);
         } catch (err) {
-          console.warn("Audio graph:", err);
+          console.warn("Audio graph connection failed:", err);
         }
       }
 
@@ -1846,7 +1910,8 @@ function searchWithFallback(candidates, index) {
         state.currentPreset = presetName;
 
         elements.presetChips.forEach(chip => {
-          chip.classList.toggle("active", chip.dataset.preset === presetName);
+          const isActive = chip.dataset.preset === presetName;
+          chip.classList.toggle("active", isActive);
         });
 
         if (state.eqNodes.length) {
@@ -1926,7 +1991,7 @@ function searchWithFallback(candidates, index) {
           state.audioEl.load();
           state.audioEl.src = normalizeStreamUrl(state.currentStreamUrl);
           state.audioEl.play().catch(() => {
-            showToast("Retry blocked.", 1600);
+            showToast("Retry blocked. User interaction required.", 1600);
           });
           updateBrandStatus("Retrying...");
         }
@@ -2010,12 +2075,12 @@ function searchWithFallback(candidates, index) {
 
         elements.favoritesList.innerHTML = state.favorites.map((item, idx) => {
           const name = escapeHtml(item.name || `Favorite ${idx + 1}`);
-          return `<li data-fav-url="${escapeHtml(item.url || "")}" data-fav-name="${escapeHtml(name)}">${name}<button class="list-item-remove" type="button">✕</button></li>`;
+          return `<li data-fav-url="${escapeHtml(item.url)}" data-fav-name="${escapeHtml(name)}">${name}<button class="list-item-remove" type="button">✕</button></li>`;
         }).join("");
 
         elements.favoritesList.querySelectorAll("li").forEach((li, idx) => {
-          li.addEventListener("click", function (event) {
-            if (event.target && event.target.classList.contains("list-item-remove")) {
+          li.addEventListener("click", function (e) {
+            if (e.target.classList.contains("list-item-remove")) {
               state.favorites.splice(idx, 1);
               persistFavorites();
               renderFavorites();
@@ -2041,12 +2106,12 @@ function searchWithFallback(candidates, index) {
 
         elements.queueList.innerHTML = state.queue.map((item, idx) => {
           const name = escapeHtml(item.name || `Queued ${idx + 1}`);
-          return `<li data-q-url="${escapeHtml(item.url || "")}" data-q-name="${escapeHtml(name)}">${name}<button class="list-item-remove" type="button">✕</button></li>`;
+          return `<li data-q-url="${escapeHtml(item.url)}" data-q-name="${escapeHtml(name)}">${name}<button class="list-item-remove" type="button">✕</button></li>`;
         }).join("");
 
         elements.queueList.querySelectorAll("li").forEach((li, idx) => {
-          li.addEventListener("click", function (event) {
-            if (event.target && event.target.classList.contains("list-item-remove")) {
+          li.addEventListener("click", function (e) {
+            if (e.target.classList.contains("list-item-remove")) {
               state.queue.splice(idx, 1);
               persistQueue();
               renderQueue();
@@ -2092,8 +2157,8 @@ function searchWithFallback(candidates, index) {
         elements.schedulerList.querySelectorAll("li").forEach((li, idx) => {
           const btn = li.querySelector(".list-item-remove");
           if (btn) {
-            btn.addEventListener("click", event => {
-              event.stopPropagation();
+            btn.addEventListener("click", e => {
+              e.stopPropagation();
               state.schedules.splice(idx, 1);
               persistSchedules();
               renderSchedules();
@@ -2217,7 +2282,7 @@ function searchWithFallback(candidates, index) {
       }
 
       function updatePlaytime() {
-        if (!state.audioEl || !Number.isFinite(state.audioEl.currentTime)) {
+        if (!state.audioEl || !isFinite(state.audioEl.currentTime)) {
           elements.insightPlaytime.textContent = formatSeconds(state.playSeconds || 0);
           return;
         }
@@ -2250,19 +2315,19 @@ function searchWithFallback(candidates, index) {
       function updateSignalDiagnostics() {
         const base = state.playing ? 86 : 22;
         const drift = Math.random() * 24;
-        state.buffer = clamp(Math.round(base + drift - (state.playing ? 10 : 0)), 0, 100);
-        state.snr = Math.round(24 + Math.random() * 36);
-        state.latency = Math.round(35 + Math.random() * 140);
-        state.quality = Math.round(72 + Math.random() * 28);
+        state.currentBuffer = clamp(Math.round(base + drift - (state.playing ? 10 : 0)), 0, 100);
+        state.currentSNR = Math.round(24 + Math.random() * 36);
+        state.currentLatency = Math.round(35 + Math.random() * 140);
+        state.currentQuality = Math.round(72 + Math.random() * 28);
 
-        elements.diagBuffer.textContent = `${state.buffer}%`;
-        elements.diagSNR.textContent = `${state.snr}dB`;
-        elements.diagLatency.textContent = `${state.latency}ms`;
-        elements.diagQuality.textContent = `${state.quality}%`;
+        elements.diagBuffer.textContent = `${state.currentBuffer}%`;
+        elements.diagSNR.textContent = `${state.currentSNR}dB`;
+        elements.diagLatency.textContent = `${state.currentLatency}ms`;
+        elements.diagQuality.textContent = `${state.currentQuality}%`;
 
-        elements.hudBuffer.textContent = `${state.buffer}%`;
-        elements.hudLatency.textContent = `${state.latency}ms`;
-        elements.hudQuality.textContent = `${state.quality}%`;
+        elements.hudBuffer.textContent = `${state.currentBuffer}%`;
+        elements.hudLatency.textContent = `${state.currentLatency}ms`;
+        elements.hudQuality.textContent = `${state.currentQuality}%`;
       }
 
       function startSessionTimers() {
@@ -2297,7 +2362,7 @@ function searchWithFallback(candidates, index) {
       function setTheme(themeName) {
         const root = document.documentElement;
         const isLight = themeName === "light";
-        root.style.setProperty("--bg-0", isLight ? "#f0f1f4" : "#06080d");
+        root.style.setProperty("--bg-0", isLight ? "#f0f1f4" : "#05070b");
         root.style.setProperty("--bg-1", isLight ? "#f9fafb" : "#0d1117");
         root.style.setProperty("--bg-2", isLight ? "#ffffff" : "#121922");
         root.style.setProperty("--text", isLight ? "#0d1117" : "#f7f3de");
@@ -2308,7 +2373,7 @@ function searchWithFallback(candidates, index) {
         const content = modalMap[key];
         if (!content) return;
 
-        const titles = { about: "About TMW-RP", shortcuts: "Keyboard Shortcuts", troubleshooting: "Troubleshooting", stats: "Session Stats" };
+        const titles = { about: "About TMW-RP", shortcuts: "Keyboard Help", troubleshooting: "Troubleshooting", stats: "Session Stats" };
         elements.modalTitle.textContent = titles[key] || "Info";
         elements.modalBody.innerHTML = "<ul>" + content.map(item => `<li>${escapeHtml(item)}</li>`).join("") + "</ul>";
         elements.modalOverlay.classList.remove("hidden");
@@ -2354,8 +2419,7 @@ function searchWithFallback(candidates, index) {
           eqValues: state.eqValues,
           theme: state.currentTheme,
           volume: state.currentVolume,
-          exportedAt: new Date().toISOString(),
-          version: "1.2"
+          exportedAt: new Date().toISOString()
         };
 
         const json = JSON.stringify(data, null, 2);
@@ -2468,7 +2532,7 @@ function searchWithFallback(candidates, index) {
         }
 
         const data = new Uint8Array(48);
-        for (let i = 0; i < data.length; i += 1) {
+        for (let i = 0; i < data.length; i++) {
           data[i] = Math.max(18, Math.min(200, Math.random() * 220));
         }
 
@@ -2590,55 +2654,10 @@ function searchWithFallback(candidates, index) {
         }
       }
 
-      elements.csvFileInput.addEventListener("change", function (event) {
-        if (this.files && this.files.length) {
-          loadCsvOrPlaylist(this.files[0]);
-        }
+      requestAnimationFrame(function renderLoop() {
+        drawVisualizer();
+        requestAnimationFrame(renderLoop);
       });
-
-      function loadCsvOrPlaylist(file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const text = e.target.result;
-          const lines = text.split("\n").filter(line => line.trim());
-          const parsed = [];
-
-          lines.forEach(line => {
-            const trimmed = line.trim();
-            if (!trimmed || trimmed.startsWith("#")) return;
-
-            if (trimmed.includes(",")) {
-              const parts = trimmed.split(",");
-              parsed.push({
-                name: (parts[0] || "Station").trim(),
-                url: (parts[1] || "").trim(),
-                stationuuid: `csv-${Date.now()}-${Math.random()}`,
-                country: (parts[2] || "Unknown").trim(),
-                tags: (parts[3] || "").trim()
-              });
-            } else if (trimmed.match(/^https?:\/\//)) {
-              parsed.push({
-                name: `Stream ${parsed.length + 1}`,
-                url: trimmed,
-                stationuuid: `csv-${Date.now()}-${Math.random()}`,
-                country: "Imported",
-                tags: "csv"
-              });
-            }
-          });
-
-          if (parsed.length) {
-            state.stations = parsed;
-            renderTargetStations();
-            selectStation(state.stations[0]);
-            showToast(`Loaded ${parsed.length} stations from file`, 1500);
-          } else {
-            showToast("No valid stations in file", 1600);
-          }
-        };
-
-        reader.readAsText(file);
-      }
 
       init();
     })();
